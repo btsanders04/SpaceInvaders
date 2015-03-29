@@ -6,6 +6,7 @@ class Alien {
   int yPos;
   boolean moveRight=false;
   boolean canShoot=true;
+  boolean killed=false;
   int bulletTimer=0;
   Bullet b;
   public Alien(int x, int y)
@@ -16,9 +17,21 @@ class Alien {
   }
 
   public void updateAlien(){
+    if(d.b!=null){
+    if(isCollision(xPos+size/2,yPos+size/2,d.b.xPos,d.b.yPos)){
+      killed=true;
+      }
+    else{
+    image(img,xPos,yPos,size,size);
+    moveHorizontal();
+    shoot();  
+      }
+    }
+    else{
     image(img,xPos,yPos,size,size);
     moveHorizontal();
     shoot();
+    }    
   }
   
   private void moveHorizontal(){
@@ -58,8 +71,9 @@ class Alien {
     }
   }
   
+  
   public boolean inRange(){
-    System.out.println(d.xPos);
+    //System.out.println(d.xPos);
     if(Math.abs(this.xPos - d.xPos) <=10){
       return true;
     }

@@ -2,6 +2,7 @@ import processing.serial.*;
 Serial myPort;
 
 PImage bg;
+int colBox=20;
 Alien a;
 Defender d;
 
@@ -17,11 +18,31 @@ void setup(){
 void draw(){
   
   image(bg,0,0,width,height);
-  a.updateAlien();
+  if(a!=null){
+    if(a.killed){
+      a=null;
+    }
+    else{
+    a.updateAlien();
+    }
+  }
+  else{
+    a.updateAlien();
+  }
   d.updateDefender();
 }
 
 
+public boolean isCollision(int xShip, int yShip, int xBul, int yBul){
+    if(Math.abs(xShip-xBul)<=colBox){
+      if(Math.abs(yShip-yBul)<=colBox){
+      //  collisionCin();
+        //b.destroyBullet();
+        return true;
+      }
+    }
+    return false;
+  }
 
 
 
@@ -31,8 +52,4 @@ x = (int) map(xdata,0,255,0,width);
 
 }
 */
-void mousePressed(){
-  
- // loaded=true;
-  
-}
+
