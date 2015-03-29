@@ -52,14 +52,15 @@ public boolean isCollision(int xShip, int yShip, int xBul, int yBul){
 
 
 
-void serialEvent(Serial thePort) {
+/*void serialEvent(Serial thePort) {
 String input = thePort.readString();
 String[] values = split(input, ','); 
 float[] values = float(numbers);
 xdata = values[0];
 fire = values[1];
 x = (int) map(xdata,0,255,0,width);
-
 }
+*/
+
 
 
