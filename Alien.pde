@@ -17,15 +17,23 @@ class Alien {
   }
 
   public void updateAlien(){
+    if(d!=null){
     if(d.b!=null){
     if(isCollision(xPos+size/2,yPos+size/2,d.b.xPos,d.b.yPos)){
       killed=true;
+      b.destroyBullet();
       }
     else{
     image(img,xPos,yPos,size,size);
     moveHorizontal();
     shoot();  
       }
+    }
+    else{
+    image(img,xPos,yPos,size,size);
+    moveHorizontal();
+    shoot();
+    }    
     }
     else{
     image(img,xPos,yPos,size,size);
@@ -74,12 +82,15 @@ class Alien {
   
   public boolean inRange(){
     //System.out.println(d.xPos);
+    if(d!=null){
     if(Math.abs(this.xPos - d.xPos) <=10){
       return true;
     }
     else{
       return false;
     }
+    }
+    return false;
   }
   
 }

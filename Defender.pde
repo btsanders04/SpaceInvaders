@@ -14,6 +14,7 @@ public class Defender{
     if(a.b!=null){
     if(isCollision(xPos+size/2,yPos+size/2,a.b.xPos,a.b.yPos)){
       killed=true;
+     // b.destroyBullet();
       }
    else{
     moveDefender();
@@ -28,7 +29,7 @@ public class Defender{
        image(ship,xPos,yPos,size,size); 
         if(b!=null){ 
          b.updateBullet(true);
-      }
+        }
     }
    }
   
@@ -42,7 +43,7 @@ public class Defender{
         xPos+=5;
       }
       else if(key==' '){
-        b= new Bullet(xPos+size/2,yPos);
+        b=new Bullet(xPos+size/2,yPos);
       }
     }
   }
