@@ -21,7 +21,7 @@ class Alien {
     if(d.b!=null){
     if(isCollision(xPos+size/2,yPos+size/2,d.b.xPos,d.b.yPos)){
       killed=true;
-      b.destroyBullet();
+    //  b.destroyBullet();
       }
     else{
     image(img,xPos,yPos,size,size);
