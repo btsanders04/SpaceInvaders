@@ -7,6 +7,7 @@ class Alien {
   boolean moveRight=false;
   boolean canShoot=true;
   int bulletTimer=0;
+  Bullet b;
   public Alien(int x, int y)
   {
     xPos=x;
@@ -22,7 +23,7 @@ class Alien {
   
   private void moveHorizontal(){
     int dx=1;
-    System.out.println(xPos);
+  //  System.out.println(xPos);
     if(xPos <= 0){
       moveRight=true;
       this.moveVertical();
@@ -46,17 +47,26 @@ class Alien {
     if(bulletTimer>100){
       canShoot=true;
     }
-    if(canShoot){ //&& inRange()){
-      Bullet b = new Bullet(xPos+size/2, yPos+size/2);
+    if(canShoot && inRange()){
+      b = new Bullet(xPos+size/2, yPos+size/2);
       canShoot=false;
       bulletTimer=0;
     }
     bulletTimer++;
+    if(b!=null){
+    b.updateBullet(false);
+    }
   }
   
-  //public boolean inRange(){
- //   if(
- // }
+  public boolean inRange(){
+    System.out.println(d.xPos);
+    if(Math.abs(this.xPos - d.xPos) <=10){
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
   
 }
 

@@ -9,11 +9,18 @@ public class Bullet {
   }
   
   
-  public void updateBullet(){
+  public void updateBullet(boolean isD){
     int dy =10;
+    if(isD){
+    yPos-=dy;
+    }
+    else 
     yPos+=dy;
-    
+    stroke(255,0,0);
+    strokeWeight(3);
+    line(xPos,yPos,xPos,yPos+dy);
   }
   
+    
 
 }
