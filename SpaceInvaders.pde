@@ -26,10 +26,14 @@ void draw(){
     a.updateAlien();
     }
   }
-  else{
-    a.updateAlien();
+  if(d!=null){
+    if(d.killed){
+      d=null;
+    }
+    else{
+    d.updateDefender();
+    }
   }
-  d.updateDefender();
 }
 
 
