@@ -5,7 +5,9 @@ public class Defender{
   int yPos=height-size;
   PImage ship;
   boolean killed=false;
-  Bullet b;
+  int round = 0;
+  Bullet[] bullets= new Bullet[5];
+  //Bullet b;
   public Defender(){
     ship = loadImage("spaceship-new.png");
   }
@@ -17,32 +19,17 @@ public class Defender{
       killed=true;
       a.b.destroyBullet();
       }
-   else{
-    moveDefender();
-     image(ship,xPos,yPos,size,size); 
-      if(b!=null){ 
-       b.updateBullet(true);
-      }
-     }
     }
-   else{
+  }
      moveDefender();
        image(ship,xPos,yPos,size,size); 
+       for(Bullet b: bullets){
         if(b!=null){ 
          b.updateBullet(true);
         }
+       }
     }
-   }
-  else{
-     moveDefender();
-       image(ship,xPos,yPos,size,size); 
-        if(b!=null){ 
-         b.updateBullet(true);
-        }
-    }
-    
-   }
-  
+
   public void moveDefender(){
     if(keyPressed){
       if(key=='a' && xPos >=0)
@@ -53,8 +40,23 @@ public class Defender{
         xPos+=5;
       }
       else if(key==' '){
-        b=new Bullet(xPos+size/2,yPos);
+        if(round<bullets.length){
+        bullets[round]=new Bullet(xPos+size/2,yPos);
+        round++;
+        }
+      }
+      else if(key=='r'){
+        //reload();
+        }
+      }
+    }
+  
+  private void reload(){
+    for(Bullet b: bullets){
+      if(b==null){
+        //b=
       }
     }
   }
+  
 }

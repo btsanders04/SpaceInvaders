@@ -18,29 +18,19 @@ class Alien {
 
   public void updateAlien(){
     if(d!=null){
-      if(d.b!=null){
-        if(isCollision(xPos+size/2,yPos+size/2,d.b.xPos,d.b.yPos)){
-          killed=true;
-          d.b.destroyBullet();
-        }
-        else{
-        image(img,xPos,yPos,size,size);
-        moveHorizontal();
-        shoot();  
-        }
+      for(Bullet b: d.bullets){
+        if(b!=null){
+          if(isCollision(xPos+size/2,yPos+size/2,b.xPos,b.yPos)){
+            killed=true;
+            b.destroyBullet();
+          }
+       }
       }
-    else{
-    image(img,xPos,yPos,size,size);
-    moveHorizontal();
-    shoot();
-    }    
     }
-    else{
     image(img,xPos,yPos,size,size);
     moveHorizontal();
     shoot();
-    }    
-  }
+  }    
   
   private void moveHorizontal(){
     int dx=1;
