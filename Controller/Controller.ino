@@ -12,10 +12,10 @@ void setup () {
   pinMode(reloadPin, INPUT);
   bouncer1 .attach( firePin );
   bouncer2 .attach( reloadPin );
-  bouncer1 .interval(5);
-  bouncer2 .interval(5);
+  bouncer1 .interval(10);
+  bouncer2 .interval(10);
 
-  Serial.begin(9600);
+  Serial.begin(1200);
   Serial.println('Y');
 }
 
@@ -27,12 +27,12 @@ void loop () {
   Serial.print(",");
   delay(1);
   bouncer1.update();
-  int fire = bouncer1.read();
+  int fire = bouncer1.rose();
   Serial.print(fire); 
   Serial.print(",");
   delay(1);
   bouncer2.update();
-  int reload = bouncer2.read();
+  int reload = bouncer2.rose();
   Serial.println(reload);
   //  }
 }
