@@ -5,8 +5,7 @@ PImage bg;
 int colBox=20;
 Alien a;
 Defender d;
-int x;
-int fire;
+boolean keyReleased=true;
 
 void setup(){
   bg = loadImage("space-background.jpg");  
@@ -50,17 +49,21 @@ public boolean isCollision(int xShip, int yShip, int xBul, int yBul){
     return false;
   }
 
+public void keyReleased(){
+  keyReleased=true;
+}
 
+public boolean bulletOnScreen(Bullet b){
+      if(b.yPos>=0 && b.yPos <= bg.height){
+        return true;
+      }
+    return false;
+  }
 
 /*void serialEvent(Serial thePort) {
-String input = thePort.readString();
-String[] values = split(input, ','); 
-float[] values = float(numbers);
-xdata = values[0];
-fire = values[1];
+int xdata = thePort.read();
 x = (int) map(xdata,0,255,0,width);
+
 }
 */
-
-
 
