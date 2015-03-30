@@ -11,10 +11,11 @@ public class Defender{
   }
   
   public void updateDefender(){
+   if(a!=null){
     if(a.b!=null){
     if(isCollision(xPos+size/2,yPos+size/2,a.b.xPos,a.b.yPos)){
       killed=true;
-     // b.destroyBullet();
+      a.b.destroyBullet();
       }
    else{
     moveDefender();
@@ -31,6 +32,15 @@ public class Defender{
          b.updateBullet(true);
         }
     }
+   }
+  else{
+     moveDefender();
+       image(ship,xPos,yPos,size,size); 
+        if(b!=null){ 
+         b.updateBullet(true);
+        }
+    }
+    
    }
   
   public void moveDefender(){
