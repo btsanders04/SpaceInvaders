@@ -22,6 +22,8 @@ class Alien {
         if(b!=null){
           if(isCollision(xPos+size/2,yPos+size/2,b.xPos,b.yPos)){
             killed=true;
+            
+            //PROBLEM
             b=null;
           }
        }
@@ -50,7 +52,7 @@ class Alien {
   }
   
   private void moveVertical(){
-    int dy=10;
+    int dy=100;
     yPos+=dy;
   }
   

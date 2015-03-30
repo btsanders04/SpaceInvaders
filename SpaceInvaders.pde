@@ -3,15 +3,19 @@ Serial myPort;
 
 PImage bg;
 int colBox=20;
-Alien a;
+//Alien a;
+int startAlien=30;
 Defender d;
 boolean keyReleased=true;
+int armadaSize=10;
+Alien[] armada = new Alien[armadaSize];
 
 void setup(){
   bg = loadImage("space-background.jpg");  
   size(bg.width,bg.height);
  // myPort = new Serial(this, "COM17");
-  a = new Alien(50,10);
+//  a = new Alien(50,10);
+setupArmada();
   d = new Defender();
 }
 
@@ -19,6 +23,7 @@ void setup(){
 void draw(){
   
   image(bg,0,0,width,height);
+  for(Alien a: armada){
   if(a!=null){
     if(a.killed){
       a=null;
@@ -27,6 +32,7 @@ void draw(){
     a.updateAlien();
     }
   }
+  }
   if(d!=null){
     if(d.killed){
       d=null;
@@ -34,6 +40,13 @@ void draw(){
     else{
     d.updateDefender();
     }
+  }
+}
+
+public void setupArmada(){
+  for(int i=0;i<armadaSize;i++){
+    armada[i]=new Alien(startAlien,10);
+    startAlien+=100;
   }
 }
 

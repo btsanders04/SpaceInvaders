@@ -14,25 +14,32 @@ public class Defender{
   }
   
   public void updateDefender(){
-   if(a!=null){
-    if(a.b!=null){
-    if(isCollision(xPos+size/2,yPos+size/2,a.b.xPos,a.b.yPos)){
-      killed=true;
-      a.b = null;
+    for(Alien a: armada){
+     if(a!=null){
+      if(a.b!=null){
+      if(isCollision(xPos+size/2,yPos+size/2,a.b.xPos,a.b.yPos)){
+        killed=true;
+        a.b = null;
+        }
       }
+     }
     }
-  }
      moveDefender();
        image(ship,xPos,yPos,size,size); 
-       System.out.println("NEW");
+    //   System.out.println("NEW");
        for(Bullet b: bullets){
+    //     System.out.println(b);
         if(b!=null){
           if(bulletOnScreen(b)){ 
            b.updateBullet(true);
           }
-          else b=null;
+          else {
+            //PROBLEM
+            b=null;
+            System.out.println(b);
+          }
         }
-        System.out.println(b);
+  //      System.out.println(b);
        }
     }
 
@@ -67,10 +74,12 @@ public class Defender{
   
   private void reload(){
     for(int i=0; i<bullets.length;i++){
-      if(bullets[i]==null){
-        round=i;
-        break;
-      }
+      System.out.println(bullets[i]);
+    //  if(bullets[i]==null){
+     //   round=i;
+     //   System.out.println(bullets[i]);
+   //     break;
+  //    }
     }
     System.out.println(round);
   }
