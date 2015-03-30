@@ -23,6 +23,7 @@ class Alien {
           if(isCollision(xPos+size/2,yPos+size/2,d.bullets[i].xPos,d.bullets[i].yPos)){
             killed=true;
             d.bullets[i]=null;
+            d.kills++;
           }
        }
       }

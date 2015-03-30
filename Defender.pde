@@ -8,6 +8,7 @@ public class Defender{
   int round = 0;
   int clip=5;
   int capacity=0;
+  int kills=0;
 Bullet[] bullets=new Bullet[clip*2];
   //Bullet b;
   public Defender(){
@@ -27,6 +28,7 @@ Bullet[] bullets=new Bullet[clip*2];
     }
      moveDefender();
      drawClip();
+     killCount();
        image(ship,xPos,yPos,size,size); 
        for(int i=0; i<bullets.length;i++){
         if(bullets[i]!=null){
@@ -73,6 +75,12 @@ Bullet[] bullets=new Bullet[clip*2];
       line(dx,height-10,dx,height-20);
       dx-=10;
     }
+  }
+  
+  private void killCount(){
+    fill(255,255,255);
+    textSize(32);
+    text(kills,20,height-20);
   }
   
   private void reload(){  
