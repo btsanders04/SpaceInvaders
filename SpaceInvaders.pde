@@ -46,6 +46,9 @@ void draw(){
       d.updateDefender();
       }
     }
+    //else{
+    //  gameOver();
+   // }
   }
 }
 
