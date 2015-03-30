@@ -61,6 +61,8 @@ public class Defender{
         keyReleased=false;
         }
       }
+      
+      //fix reload. bullets arent becoming null above
       else if(key=='r' && keyReleased){
         reload();
         capacity=0;

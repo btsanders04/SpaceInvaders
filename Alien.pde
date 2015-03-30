@@ -52,7 +52,7 @@ class Alien {
   }
   
   private void moveVertical(){
-    int dy=100;
+    int dy=50;
     yPos+=dy;
   }
   
