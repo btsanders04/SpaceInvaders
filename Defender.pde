@@ -6,8 +6,9 @@ public class Defender{
   PImage ship;
   boolean killed=false;
   int round = 0;
+  int clip=5;
   int capacity=0;
-  Bullet[] bullets= new Bullet[10];
+Bullet[] bullets=new Bullet[clip*2];
   //Bullet b;
   public Defender(){
     ship = loadImage("spaceship-new.png");
@@ -25,21 +26,17 @@ public class Defender{
      }
     }
      moveDefender();
+     drawClip();
        image(ship,xPos,yPos,size,size); 
-    //   System.out.println("NEW");
-       for(Bullet b: bullets){
-    //     System.out.println(b);
-        if(b!=null){
-          if(bulletOnScreen(b)){ 
-           b.updateBullet(true);
+       for(int i=0; i<bullets.length;i++){
+        if(bullets[i]!=null){
+          if(bulletOnScreen(bullets[i])){ 
+           bullets[i].updateBullet(true);
           }
           else {
-            //PROBLEM
-            b=null;
-            System.out.println(b);
+            bullets[i]=null;
           }
         }
-  //      System.out.println(b);
        }
     }
 
@@ -55,35 +52,38 @@ public class Defender{
       else if(key==' ' && keyReleased){
         if(capacity<bullets.length/2){
         bullets[round]=new Bullet(xPos+size/2,yPos);
-        capacity++;
         round++;
-   //     System.out.println(round);
+        capacity++;
         keyReleased=false;
         }
       }
-      
-      //fix reload. bullets arent becoming null above
+
       else if(key=='r' && keyReleased){
         reload();
-        capacity=0;
         keyReleased=false;
         }
       }
      
     }
   
-  
-  
-  private void reload(){
-    for(int i=0; i<bullets.length;i++){
-      System.out.println(bullets[i]);
-    //  if(bullets[i]==null){
-     //   round=i;
-     //   System.out.println(bullets[i]);
-   //     break;
-  //    }
+  private void drawClip(){
+    int dx=width-20;
+    for(int i=0; i<clip-capacity;i++){
+      stroke(0,0,255);
+      line(dx,height-10,dx,height-20);
+      dx-=10;
     }
-    System.out.println(round);
   }
+  
+  private void reload(){  
+   for(int i=0; i< bullets.length;i++){
+     if(bullets[i]==null){
+       round=i;
+       capacity=0;
+       break;
+     }
+   }
+  }
+    
   
 }

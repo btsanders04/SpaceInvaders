@@ -18,13 +18,11 @@ class Alien {
 
   public void updateAlien(){
     if(d!=null){
-      for(Bullet b: d.bullets){
-        if(b!=null){
-          if(isCollision(xPos+size/2,yPos+size/2,b.xPos,b.yPos)){
+      for(int i=0; i<d.bullets.length;i++){
+        if(d.bullets[i]!=null){
+          if(isCollision(xPos+size/2,yPos+size/2,d.bullets[i].xPos,d.bullets[i].yPos)){
             killed=true;
-            
-            //PROBLEM
-            b=null;
+            d.bullets[i]=null;
           }
        }
       }
