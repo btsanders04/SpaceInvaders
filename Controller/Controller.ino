@@ -7,8 +7,8 @@ Bounce bouncer1 = Bounce();
 Bounce bouncer2 = Bounce();
 
 void setup () {
-  pinMode(firePin, INPUT);
-  pinMode(reloadPin, INPUT);
+  pinMode(firePin, INPUT_PULLUP);
+  pinMode(reloadPin, INPUT_PULLUP);
   pinMode(speakerPin, OUTPUT);
   bouncer1 .attach( firePin );
   bouncer2 .attach( reloadPin );
