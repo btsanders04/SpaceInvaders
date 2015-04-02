@@ -148,8 +148,8 @@ void serialEvent(Serial thePort) {
 }*/
 
 void serialFun(){
-  myPort.write(1);
-  delay(50);
+  
+ /*
   if(myPort.available()>0){
   String input = myPort.readString();
   String[] numbers = split(input, ',');
@@ -158,6 +158,19 @@ void serialFun(){
   ydata = (int)value[1];
   fireButt=(int)value[2];
   reloadButt=(int)value[3]; 
+  */
+  myPort.write(1);
+  delay(5);
+  xdata = myPort.read();
+  myPort.write(2);
+  delay(5);
+  ydata = myPort.read();
+  myPort.write(3);
+  delay(5);
+  fireButt = myPort.read();
+  myPort.write(4);
+  delay(5);
+  reloadButt = myPort.read();
   }
 }
 
