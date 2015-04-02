@@ -7,6 +7,7 @@ Bounce bouncer1 = Bounce();
 Bounce bouncer2 = Bounce();
 int fire;
 int reload;
+int serial;
 
 void setup () {
   pinMode(firePin, INPUT_PULLUP);
@@ -34,19 +35,25 @@ void loop () {
   }
   
   if(Serial.available()>0) {
-  Serial.read();
+  serial = Serial.read();
   int posx = analogRead(A0);
   int posy = analogRead(A1);
  
   //int fire = digitalRead(firePin);
   //int reload = digitalRead(reloadPin);
+  
+  if(serial == 49){
   Serial.write(posx/4);
-  delay(1);
+  }
+  if(serial == 50){
   Serial.write(posy/4);
-  delay(1);
+  }
+  if(serial == 51){
   Serial.write(fire); 
-  delay(1);
+  }
+  if(serial == 52){
   Serial.write(reload);
+  }
   if(reload == 1){
     playNote('c', 30);
     playNote('d', 30);
