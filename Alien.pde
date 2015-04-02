@@ -71,7 +71,7 @@ class Alien {
     b.updateBullet(false);
     if(!bulletOnScreen(b))
       {
-      b=null;
+        b=null;
       }
     }
   }

@@ -79,10 +79,10 @@ Bullet[] bullets=new Bullet[clip*2];
     
     public void moveDefender(){
       
-      if(xdata<30){
+      if(xdata<30 && xPos<=width-size){
         xPos+=5;
       }
-      else if(xdata>200){
+      else if(xdata>200 && xPos>=0){
         xPos-=5;
       }
       if (fireButt==1){

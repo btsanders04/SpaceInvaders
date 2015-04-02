@@ -50,19 +50,22 @@ void draw(){
   }
   else{
     stillAlive=false;
-    for(Alien a: armada){
-    if(a!=null){
+    for(int i=0; i<armada.length;i++){
+    if(armada[i]!=null){
+      //println("ALIVE");
       stillAlive=true;
-      if(a.killed){
+      if(armada[i].killed){
         
-        if(a.b==null)
-          a=null;
+        if(armada[i].b==null){
+          armada[i]=null;
+          //println("A is null");
+        }
         else{
-          a.shoot();
+          armada[i].shoot();
         }
       }
       else{
-      a.updateAlien();
+      armada[i].updateAlien();
       }
     }
     }
@@ -111,7 +114,7 @@ public boolean bulletOnScreen(Bullet b){
   
 public void runStartUp(){
   if(fireButt==1){
-    System.out.println(fireButt);
+  //  System.out.println(fireButt);
     startScreen=false;
   }
   textSize(50);
@@ -184,7 +187,7 @@ if(myPort.available() >=4){
   fireButt=myPort.read();
   reloadButt=myPort.read();
 }
- println(xdata + " : " + ydata + " : " + fireButt + " : " + reloadButt);
+// println(xdata + " : " + ydata + " : " + fireButt + " : " + reloadButt);
 /*  myPort.write(1);
   delay(5);
   xdata = myPort.read();
