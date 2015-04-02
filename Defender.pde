@@ -79,23 +79,29 @@ Bullet[] bullets=new Bullet[clip*2];
     
     public void moveDefender(){
       
-      if(xdata<100){
-        xPos-=5;
-      }
-      else if(xdata>800){
+      if(xdata<30){
         xPos+=5;
       }
+      else if(xdata>200){
+        xPos-=5;
+      }
       if (fireButt==1){
+        System.out.println("HEY");
         if(capacity<bullets.length/2){
         bullets[round]=new Bullet(xPos+size/2,yPos);
         round++;
         capacity++;
+        }
       }
-      if (reloadButt==1){
+       if (reloadButt==1){
+        println("HEY");
         reload();
       }
+      else if(key=='r' && keyReleased){
+        reload();
+        keyReleased=false;
+        }
             
-    }
     }
   
   private void drawClip(){

@@ -76,7 +76,6 @@ class Alien {
     }
   }
   
-  
   public boolean inRange(){
     //System.out.println(d.xPos);
     if(d!=null){

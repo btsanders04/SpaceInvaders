@@ -12,6 +12,7 @@ int reloadButt=0;
 int startAlien;
 Defender d;
 boolean keyReleased = true;
+boolean stillAlive=false;;
 int armadaSize;
 Alien[] armada;
 boolean startScreen=true;
@@ -33,7 +34,6 @@ void setup(){
   armada = new Alien[armadaSize];
   setupArmada();
   d = new Defender();
-  myPort.write(1);
   delay(1000);
 }
 
@@ -49,12 +49,14 @@ void draw(){
     runGameOver();
   }
   else{
-    
+    stillAlive=false;
     for(Alien a: armada){
     if(a!=null){
+      stillAlive=true;
       if(a.killed){
+        
         if(a.b==null)
-        a=null;
+          a=null;
         else{
           a.shoot();
         }
@@ -71,12 +73,15 @@ void draw(){
     //else{
     //  gameOver();
    // }
+   if(!stillAlive){
+     runGameOver();
+   }
   }
 }
 
 public void setupArmada(){
   for(int i=0;i<armadaSize;i++){
-    armada[i]=new Alien(startAlien,10);
+    armada[i]=new Alien(startAlien,20);
     startAlien+=100;
   }
 }
@@ -106,6 +111,7 @@ public boolean bulletOnScreen(Bullet b){
   
 public void runStartUp(){
   if(fireButt==1){
+    System.out.println(fireButt);
     startScreen=false;
   }
   textSize(50);
@@ -126,7 +132,19 @@ public void runGameOver(){
   if(fireButt==1){
     gameOver=false;
     keyReleased=false;
-    setup();
+     bg = loadImage("space-background.jpg");  
+  size(bg.width,bg.height);
+  
+//  a = new Alien(50,10);
+  ycolBox=30;
+  xcolBox=40;
+  startAlien=30;
+ 
+  armadaSize=10;
+  armada = new Alien[armadaSize];
+  setupArmada();
+  d = new Defender();
+  delay(1000);
   }
 }
 
@@ -159,7 +177,15 @@ void serialFun(){
   fireButt=(int)value[2];
   reloadButt=(int)value[3]; 
   */
-  myPort.write(1);
+  myPort.write(0);
+if(myPort.available() >=4){
+  ydata=myPort.read();
+  xdata=myPort.read();
+  fireButt=myPort.read();
+  reloadButt=myPort.read();
+}
+ println(xdata + " : " + ydata + " : " + fireButt + " : " + reloadButt);
+/*  myPort.write(1);
   delay(5);
   xdata = myPort.read();
   myPort.write(2);
@@ -171,7 +197,7 @@ void serialFun(){
   myPort.write(4);
   delay(5);
   reloadButt = myPort.read();
-  }
+  }*/
 }
 
 
