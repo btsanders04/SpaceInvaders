@@ -1,10 +1,12 @@
 #include <Bounce2.h>
 
-int firePin = 7;
-int reloadPin = 5;
-int speakerPin = 10;
+int firePin = 10;
+int reloadPin = 9;
+int speakerPin = 6;
 Bounce bouncer1 = Bounce();
 Bounce bouncer2 = Bounce();
+int fire;
+int reload;
 
 void setup () {
   pinMode(firePin, INPUT_PULLUP);
@@ -12,44 +14,59 @@ void setup () {
   pinMode(speakerPin, OUTPUT);
   bouncer1 .attach( firePin );
   bouncer2 .attach( reloadPin );
-  bouncer1 .interval(10);
-  bouncer2 .interval(10);
+  bouncer1 .interval(5);
+  bouncer2 .interval(5);
 
   Serial.begin(9600);
-  Serial.println('Y');
+  //Serial.println('Y');
 }
 
 
 void loop () {
-  // if(Serial.available()>0) {
-  int pos = analogRead(A0);
   bouncer1.update();
-  int fire = bouncer1.fell();
-  //int fire = digitalRead(firePin);
+  if (bouncer1.fell() == 1){
+   fire = 1;
+  }
+  
   bouncer2.update();
-  int reload = bouncer2.fell();
+  if (bouncer2.fell() == 1){
+   reload = 1;
+  }
+  
+  if(Serial.available()>0) {
+  Serial.read();
+  int posx = analogRead(A0);
+  int posy = analogRead(A1);
+ 
+  //int fire = digitalRead(firePin);
   //int reload = digitalRead(reloadPin);
-  Serial.print(pos);
+  Serial.print(posx);
+  Serial.print(",");
+  delay(1);
+  Serial.print(posy);
   Serial.print(",");
   delay(1);
   Serial.print(fire); 
   Serial.print(",");
   delay(1);
   Serial.println(reload);
-  if(fire == 1){
+  if(reload == 1){
     playNote('c', 30);
     playNote('d', 30);
     playNote('e', 30);
     playNote('f', 30);
   }
 
-  if(reload == 1){
+  if(fire == 1){
     playNote('C', 30);
     playNote('b', 30);
     playNote('a', 30);
     playNote('g', 30);
   }
-  //  }
+  
+  fire = 0;
+  reload = 0;
+    }
 }
 
 void playNote(char note, int duration) {

@@ -2,36 +2,62 @@ import processing.serial.*;
 Serial myPort;
 
 PImage bg;
-int colBox=20;
+int xcolBox;
+int ycolBox;
+int xdata=0;
+int ydata=0;
+int fireButt=0;
+int reloadButt=0;
 //Alien a;
-int startAlien=30;
+int startAlien;
 Defender d;
-boolean keyReleased=true;
-int armadaSize=10;
-Alien[] armada = new Alien[armadaSize];
+boolean keyReleased = true;
+int armadaSize;
+Alien[] armada;
 boolean startScreen=true;
+boolean gameOver=false;
+int grabData=100;
 
 void setup(){
+//  println(Serial.list());
+  myPort = new Serial(this,Serial.list()[2],9600);
   bg = loadImage("space-background.jpg");  
   size(bg.width,bg.height);
- // myPort = new Serial(this, "COM17");
+  
 //  a = new Alien(50,10);
+  ycolBox=30;
+  xcolBox=40;
+  startAlien=30;
+ 
+  armadaSize=10;
+  armada = new Alien[armadaSize];
   setupArmada();
   d = new Defender();
+  myPort.write(1);
+  delay(1000);
 }
 
 
 void draw(){
-  image(bg,0,0,width,height);
+
+  serialFun();
+  image(bg,0, 0,width,height);
   if(startScreen){
     runStartUp();
+  }
+  else if(gameOver){
+    runGameOver();
   }
   else{
     
     for(Alien a: armada){
     if(a!=null){
       if(a.killed){
+        if(a.b==null)
         a=null;
+        else{
+          a.shoot();
+        }
       }
       else{
       a.updateAlien();
@@ -39,12 +65,8 @@ void draw(){
     }
     }
     if(d!=null){
-      if(d.killed){
-        d=null;
-      }
-      else{
       d.updateDefender();
-      }
+   
     }
     //else{
     //  gameOver();
@@ -61,8 +83,8 @@ public void setupArmada(){
 
 
 public boolean isCollision(int xShip, int yShip, int xBul, int yBul){
-    if(Math.abs(xShip-xBul)<=colBox){
-      if(Math.abs(yShip-yBul)<=colBox){
+    if(Math.abs(xShip-xBul)<=xcolBox){
+      if(Math.abs(yShip-yBul)<=ycolBox){
       //  collisionCin();
         //b.destroyBullet();
         return true;
@@ -83,7 +105,7 @@ public boolean bulletOnScreen(Bullet b){
   }
   
 public void runStartUp(){
-  if(key==' '){
+  if(fireButt==1){
     startScreen=false;
   }
   textSize(50);
@@ -94,12 +116,49 @@ public void runStartUp(){
   
 }  
 
-  
-
-/*void serialEvent(Serial thePort) {
-int xdata = thePort.read();
-x = (int) map(xdata,0,255,0,width);
-
+public void runGameOver(){
+    image(bg,0,0,width,height);
+    textSize(50);
+    text("GAME OVER", width/3,height/4);
+    textSize(30);
+    text("Final Score: " + d.kills, width/3,height/3);
+    text("Press 'SPACE' to begin a new conquest", width/3, height/2);
+  if(fireButt==1){
+    gameOver=false;
+    keyReleased=false;
+    setup();
+  }
 }
-*/
+
+  
+/*
+void serialEvent(Serial thePort) {
+  try{
+  String input = thePort.readString();
+  String[] numbers = split(input, ',');
+  float[] value = float(numbers);
+  xdata = (int)value[0];
+  ydata = (int)value[1];
+  fireButt=(int)value[2];
+  reloadButt=(int)value[3]; 
+  }
+  catch (Exception e) {
+    println("Initialization exception");
+  }
+}*/
+
+void serialFun(){
+  myPort.write(1);
+  delay(50);
+  if(myPort.available()>0){
+  String input = myPort.readString();
+  String[] numbers = split(input, ',');
+  float[] value = float(numbers);
+  xdata = (int)value[0];
+  ydata = (int)value[1];
+  fireButt=(int)value[2];
+  reloadButt=(int)value[3]; 
+  }
+}
+
 

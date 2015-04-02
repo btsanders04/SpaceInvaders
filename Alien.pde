@@ -2,6 +2,7 @@
 class Alien {
   PImage img;
   int size = 100;
+  int speed =2;
   int xPos;
   int yPos;
   boolean moveRight=false;
@@ -29,12 +30,13 @@ class Alien {
       }
     }
     image(img,xPos,yPos,size,size);
+  
     moveHorizontal();
     shoot();
   }    
   
   private void moveHorizontal(){
-    int dx=1;
+    int dx=speed;
   //  System.out.println(xPos);
     if(xPos <= 0){
       moveRight=true;
@@ -67,6 +69,10 @@ class Alien {
     bulletTimer++;
     if(b!=null){
     b.updateBullet(false);
+    if(!bulletOnScreen(b))
+      {
+      b=null;
+      }
     }
   }
   

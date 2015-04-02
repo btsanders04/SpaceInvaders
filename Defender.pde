@@ -9,6 +9,7 @@ public class Defender{
   int clip=5;
   int capacity=0;
   int kills=0;
+  int numLives=3;
 Bullet[] bullets=new Bullet[clip*2];
   //Bullet b;
   public Defender(){
@@ -16,10 +17,16 @@ Bullet[] bullets=new Bullet[clip*2];
   }
   
   public void updateDefender(){
+
     for(Alien a: armada){
      if(a!=null){
       if(a.b!=null){
       if(isCollision(xPos+size/2,yPos+size/2,a.b.xPos,a.b.yPos)){
+        numLives--;
+        if(numLives==0)
+        {
+          gameOver=true;
+        }
         killed=true;
         a.b = null;
         }
@@ -28,6 +35,7 @@ Bullet[] bullets=new Bullet[clip*2];
     }
      moveDefender();
      drawClip();
+     drawLives();
      killCount();
        image(ship,xPos,yPos,size,size); 
        for(int i=0; i<bullets.length;i++){
@@ -42,7 +50,7 @@ Bullet[] bullets=new Bullet[clip*2];
        }
     }
 
-  public void moveDefender(){
+/*  public void moveDefender(){
     if(keyPressed){
       if(key=='a' && xPos >=0)
       {
@@ -65,7 +73,29 @@ Bullet[] bullets=new Bullet[clip*2];
         keyReleased=false;
         }
       }
+      
      
+    }*/
+    
+    public void moveDefender(){
+      
+      if(xdata<100){
+        xPos-=5;
+      }
+      else if(xdata>800){
+        xPos+=5;
+      }
+      if (fireButt==1){
+        if(capacity<bullets.length/2){
+        bullets[round]=new Bullet(xPos+size/2,yPos);
+        round++;
+        capacity++;
+      }
+      if (reloadButt==1){
+        reload();
+      }
+            
+    }
     }
   
   private void drawClip(){
@@ -74,6 +104,15 @@ Bullet[] bullets=new Bullet[clip*2];
       stroke(0,0,255);
       line(dx,height-10,dx,height-20);
       dx-=10;
+    }
+  }
+  private void drawLives(){
+  
+    int liveSize=size/5;
+    int spacing=liveSize/2;
+    for(int i=0;i<numLives;i++){
+      image(ship,width-2*spacing,height-3*liveSize,liveSize,liveSize);
+      spacing+=(liveSize/2);
     }
   }
   
