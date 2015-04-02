@@ -40,16 +40,13 @@ void loop () {
  
   //int fire = digitalRead(firePin);
   //int reload = digitalRead(reloadPin);
-  Serial.print(posx);
-  Serial.print(",");
+  Serial.write(posx/4);
   delay(1);
-  Serial.print(posy);
-  Serial.print(",");
+  Serial.write(posy/4);
   delay(1);
-  Serial.print(fire); 
-  Serial.print(",");
+  Serial.write(fire); 
   delay(1);
-  Serial.println(reload);
+  Serial.write(reload);
   if(reload == 1){
     playNote('c', 30);
     playNote('d', 30);
