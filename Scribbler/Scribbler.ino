@@ -2,15 +2,18 @@
 #define RMotor 5
 
 #include <SoftwareSerial.h>  
-
+#include <math.h>
 int bluetoothTx = 2;  // TX-O pin of bluetooth mate, Arduino D2
 int bluetoothRx = 3;  // RX-I pin of bluetooth mate, Arduino D3
+double startAngle=0.0;
+double currentX=0;
+double currentY=0;
 byte serial;
 SoftwareSerial bluetooth(bluetoothTx, bluetoothRx);
 
 void setup()
 {
-  Serial.begin(9600);  // Begin the serial monitor at 9600bps
+  //Serial.begin(9600);  // Begin the serial monitor at 9600bps
   pinMode(LMotor, OUTPUT);
   pinMode(RMotor, OUTPUT);
   /*
@@ -26,7 +29,7 @@ void setup()
 }
 
 void loop() {
-
+/*
   if(Serial.available()>0){
     serial = Serial.read();
     if (serial==49){
@@ -51,8 +54,19 @@ void loop() {
        digitalWrite(RMotor, LOW);
       digitalWrite(LMotor, LOW);
     }
+    */
 }
 
+double findAngle(double x, double y){
+ double theta = atan((y-currentY)/(x-currentX));
+ double angle=theta-startAngle;
+  startAngle=theta;
+  return angle;
+}
+
+double findMag(double x, double y){
+  return sqrt(sq(x-startX)+sq(y-startY));
+}
 /*
 double findAngle(int x, int px, int py){
   
@@ -74,4 +88,3 @@ double findAngle(int x, int px, int py){
   // and loop forever and ever!
 }
 */
-}
