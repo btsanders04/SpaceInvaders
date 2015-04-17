@@ -1,21 +1,43 @@
-#define LMotor 6
-#define RMotor 5
+
 
 #include <SoftwareSerial.h>  
 #include <math.h>
+#include <Servo.h>
+
 int bluetoothTx = 2;  // TX-O pin of bluetooth mate, Arduino D2
 int bluetoothRx = 3;  // RX-I pin of bluetooth mate, Arduino D3
 double startAngle=0.0;
 double currentX=0;
 double currentY=0;
-byte serial;
 SoftwareSerial bluetooth(bluetoothTx, bluetoothRx);
+Servo myservo;
+int x;
+int y;
+const int enableL=7;
+const int enableR=9;
+const int motor_left[] = {12,13};
+const int motor_right[] = {11,10};
+
 
 void setup()
 {
-  //Serial.begin(9600);  // Begin the serial monitor at 9600bps
-  pinMode(LMotor, OUTPUT);
-  pinMode(RMotor, OUTPUT);
+  Serial.begin(9600);  // Begin the serial monitor at 9600bps
+  pinMode(enableL,OUTPUT);
+  pinMode(enableR,OUTPUT);
+  digitalWrite(enableL,HIGH);    //always enabled
+  digitalWrite(enableR,HIGH);
+  for(int i=0;i<2;i++){
+  pinMode(motor_left[i], OUTPUT);
+  pinMode(motor_right[i], OUTPUT);
+  }
+  myservo.attach(8);
+  myservo.write(90);
+  drive_forward(1000);
+  turnMotor(45);
+  drive_backward(500);
+  turnMotor(720);
+ //Serial.println(findAngle(5,5));
+  //turnMotor(45);
   /*
   bluetooth.begin(115200);  // The Bluetooth Mate defaults to 115200bps
   bluetooth.print("$");  // Print three times individually
@@ -26,52 +48,107 @@ void setup()
   // 115200 can be too fast at times for NewSoftSerial to relay the data reliably
   bluetooth.begin(9600);  // Start bluetooth serial at 9600
   */
+   
 }
 
 void loop() {
-/*
-  if(Serial.available()>0){
-    serial = Serial.read();
-    if (serial==49){
-      Serial.println("LEFT");
-      digitalWrite(LMotor, HIGH);
-      digitalWrite(RMotor, LOW);
-    }  
-    if(serial==52){
-      Serial.println("RIGHT");
-      digitalWrite(RMotor, HIGH);
-      digitalWrite(LMotor, LOW);
-    }
-    if(serial==50)
-    {
-      Serial.println("BOTH");
-       digitalWrite(RMotor, HIGH);
-      digitalWrite(LMotor, HIGH);
-    }
-      if(serial==51)
-    {
-      Serial.println("OFF");
-       digitalWrite(RMotor, LOW);
-      digitalWrite(LMotor, LOW);
-    }
-    */
+  
+ //drive_forward();
+   
+  if(Serial.available()>1){
+    x = Serial.read();
+    y = Serial.read();
+   double theta = findAngle((double)x, (double)y);
+   Serial.println(theta); 
+   Serial.println("HEY DARE");
+   
+  // digitalWrite(LMotor,HIGH);
+   }
+ 
 }
 
+
 double findAngle(double x, double y){
- double theta = atan((y-currentY)/(x-currentX));
+ double theta = (atan((y-currentY)/(x-currentX)))*(180/PI);
  double angle=theta-startAngle;
   startAngle=theta;
   return angle;
 }
 
 double findMag(double x, double y){
-  return sqrt(sq(x-startX)+sq(y-startY));
+  return sqrt(sq(x-currentX)+sq(y-currentY));
+}
+
+void lowerPen(boolean lower)
+{
+  if(lower)
+  myservo.write(80);
+  else
+  myservo.write( 90);
+}
+
+void turnMotor(double angle)
+{
+  int startTime=millis();
+  while(millis()-startTime<(angle*100)/12){
+  if(angle<180.0){
+    turn_left();
+  }
+  else {
+   turn_right();
+  }
+  }
+  motor_stop();
+}
+
+
+void motor_stop(){
+digitalWrite(motor_left[0], LOW);
+digitalWrite(motor_left[1], LOW);
+
+digitalWrite(motor_right[0], LOW);
+digitalWrite(motor_right[1], LOW);
+delay(25);
+}
+
+void drive_forward(int time){
+  int currentTime=millis();
+  while((millis()-currentTime)<time){
+digitalWrite(motor_left[0], HIGH);
+digitalWrite(motor_left[1], LOW);
+
+digitalWrite(motor_right[0], HIGH);
+digitalWrite(motor_right[1], LOW);
+  }
+}
+
+void drive_backward(int time){
+  int currentTime=millis();
+  while((millis()-currentTime)<time){
+digitalWrite(motor_left[0], LOW);
+digitalWrite(motor_left[1], HIGH);
+
+digitalWrite(motor_right[0], LOW);
+digitalWrite(motor_right[1], HIGH);
+  }
+}
+
+void turn_left(){
+digitalWrite(motor_left[0], LOW);
+digitalWrite(motor_left[1], HIGH);
+
+digitalWrite(motor_right[0], HIGH);
+digitalWrite(motor_right[1], LOW);
+}
+
+void turn_right(){
+digitalWrite(motor_left[0], HIGH);
+digitalWrite(motor_left[1], LOW);
+
+digitalWrite(motor_right[0], LOW);
+digitalWrite(motor_right[1], HIGH);
 }
 /*
-double findAngle(int x, int px, int py){
-  
-  
-}
   */
   /*
 {
