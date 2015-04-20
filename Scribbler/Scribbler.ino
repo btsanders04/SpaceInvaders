@@ -7,12 +7,13 @@
 int bluetoothTx = 2;  // TX-O pin of bluetooth mate, Arduino D2
 int bluetoothRx = 3;  // RX-I pin of bluetooth mate, Arduino D3
 double startAngle=0.0;
-double currentX=0;
-double currentY=0;
+float currentX=0;
+float currentY=0;
 SoftwareSerial bluetooth(bluetoothTx, bluetoothRx);
 Servo myservo;
 int x;
 int y;
+int dropPen=0;
 const int enableL=7;
 const int enableR=9;
 const int motor_left[] = {12,13};
@@ -32,10 +33,7 @@ void setup()
   }
   myservo.attach(8);
   myservo.write(90);
-  drive_forward(1000);
-  turnMotor(45);
-  drive_backward(500);
-  turnMotor(720);
+ 
  //Serial.println(findAngle(5,5));
   //turnMotor(45);
   /*
@@ -54,22 +52,28 @@ void setup()
 void loop() {
   
  //drive_forward();
-   
-  if(Serial.available()>1){
+  Serial.write(1);
+  if(Serial.available()>2){
     x = Serial.read();
     y = Serial.read();
+   dropPen = Serial.read();
    double theta = findAngle((double)x, (double)y);
-   Serial.println(theta); 
-   Serial.println("HEY DARE");
+   turnMotor(theta);
+ //  driveFoward(findMag((double)x, (double)y);
+   //stopMotor();
+   //Serial.println(theta); 
+   
+   //Serial.println("HEY DARE");
    
   // digitalWrite(LMotor,HIGH);
    }
+   
  
 }
 
 
-double findAngle(double x, double y){
- double theta = (atan((y-currentY)/(x-currentX)))*(180/PI);
+double findAngle(byte x, byte y){
+ double theta = (atan(((float)y-currentY)/((float)x-currentX)))*(180/PI);
  double angle=theta-startAngle;
   startAngle=theta;
   return angle;
