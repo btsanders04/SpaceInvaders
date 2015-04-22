@@ -7,34 +7,43 @@ int dataSize=10000;
 byte[][] data = new byte[dataSize][3];
 int writepointer = 0;
 int readpointer=0;
+int yLocation;
+int xLocation;
+int state = 0;
+boolean setup=true;
+Button calibrate;
+Button drawNow;
 void setup(){
   background(255);
   size(800,800);
-  myPort = new Serial(this, "COM17");
+  yLocation=height/4;
+  xLocation=width/2;
+ // myPort = new Serial(this, "COM17");
+  calibrate=new Button(5,"Calibrate",xLocation, height-2*yLocation, 48);
+  drawNow= new Button(30,"Begin Drawing", xLocation, height-yLocation, 48);
+  //println(location);
 }
 
 void draw(){
-  stroke(0);
-  if(writepointer>=dataSize){
-    writepointer=0;
-  }
-  if(mousePressed){
-    x = mouseX;
-    y = mouseY;
-    penDown=true;
-    data[writepointer][0]=(byte)(x/8);
-    data[writepointer][1]=(byte)(y/8);
-    if(penDown){
-    data[writepointer][2]=1;
-    }
-    else data[writepointer][2]=0;
-    println(data[writepointer][0] + " " + data[writepointer][1] + " " +  data[writepointer][2] + " " 
-    + findAngle(data[writepointer][0], data[writepointer][1]));
-    writepointer++;
-    line(x,y,pmouseX,pmouseY);
   
+  
+  if(state==0){
+  startPage();
   }
-  else penDown=false;
+  
+  if(state==1){
+  }
+
+
+  if(state==2){
+    if(setup){
+    background=(100);
+    setup=false;
+    }
+    paint();
+  }
+  
+  
   
   //System.out.println("X: " + x + " Y: " + y + " Pen: " + penDown);
 }
@@ -61,3 +70,58 @@ void serialEvent(Serial thePort){
    }
    readpointer++;
 }
+
+void startPage(){
+  textAlign(CENTER);
+  textSize(50);
+  text("Welcome to Scribble",xLocation, height-3*yLocation);
+   textAlign(BASELINE);
+    calibrate.drawButton();
+    drawNow.drawButton();
+   
+}
+
+void paint(){
+  
+  
+  
+  
+  
+  stroke(0);
+  
+  if(writepointer>=dataSize){
+    writepointer=0;
+  }
+  if(mousePressed){
+    x = mouseX;
+    y = mouseY;
+    penDown=true;
+    data[writepointer][0]=(byte)(x/8);
+    data[writepointer][1]=(byte)(y/8);
+    if(penDown){
+    data[writepointer][2]=1;
+    }
+    else data[writepointer][2]=0;
+    println(data[writepointer][0] + " " + data[writepointer][1] + " " +  data[writepointer][2] + " " 
+    + findAngle(data[writepointer][0], data[writepointer][1]));
+    writepointer++;
+    line(x,y,pmouseX,pmouseY);
+  
+  }
+  else penDown=false;
+}
+
+void mousePressed(){
+  if (calibrate.rectOver){
+    state=1;
+  }
+  if(drawNow.rectOver){
+    state=2;
+  }
+}
+
+void calibrate(){
+  
+}
+
+
