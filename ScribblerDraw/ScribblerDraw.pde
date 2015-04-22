@@ -147,7 +147,7 @@ void calibrate(){
  
   if(goPressed){
     
-    drawTimer(millis()-time);
+    drawTimer((millis()-time)/1000);
   }
 }
 
