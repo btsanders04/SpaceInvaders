@@ -11,12 +11,14 @@ int yLocation;
 int xLocation;
 int state = 0;
 float time=0;
+float currentTime=0;
 boolean setup=true;
 boolean goPressed=false;
 Button calibrate;
 Button drawNow;
 Button go;
 Button stop;
+Button back;
 void setup(){
   background(255);
   size(800,800);
@@ -26,6 +28,7 @@ void setup(){
   calibrate=new Button(5,"Calibrate",xLocation, height-2*yLocation, 48);
   drawNow= new Button(30,"Begin Drawing", xLocation, height-yLocation, 48);
   go = new Button(34,"GO", xLocation,height-2*yLocation, 50);
+  back = new Button(50,"Finish", xLocation,height-3*yLocation,60);
   //println(location);
 }
 
@@ -33,12 +36,16 @@ void draw(){
   
   
   if(state==0){
-  startPage();
+    if(setup){
+      background(100);
+      setup=false;
+    }
+    startPage();
   }
   
   if(state==1){
     if(setup){
-       background(100);
+       //background(100);
        setup=false;
     }
     background(100);
@@ -48,7 +55,7 @@ void draw(){
   }
 
 
-  if(state==3){
+  if(state==2){
     if(setup){
     background(100);
     setup=false;
@@ -89,18 +96,14 @@ void startPage(){
   textAlign(CENTER);
   textSize(50);
   text("Welcome to Scribble",xLocation, height-3*yLocation);
-   textAlign(BASELINE);
-    calibrate.drawButton();
-    drawNow.drawButton();
+  textAlign(BASELINE);
+  calibrate.drawButton();
+  System.out.println(calibrate.rectOver);
+  drawNow.drawButton();
    
 }
 
 void paint(){
-  
-  
-  
-  
-  
   stroke(0);
   
   if(writepointer>=dataSize){
@@ -126,30 +129,42 @@ void paint(){
 }
 
 void mousePressed(){
+  //System.out.println(calibrate.rectOver);
   if (calibrate.rectOver){
     state=1;
     setup=true;
+    calibrate.rectOver=false;
   }
-  if(drawNow.rectOver){
+  else if(drawNow.rectOver){
     state=2;
     setup=true;
   }
-  if(go.rectOver){
+  else if(go.rectOver){
     go=new Button(3, "STOP", go.rectX, go.rectY, go.textSize);
     time=millis();
     goPressed=!goPressed;
+  }
+  else if(back.rectOver){
+    state=0;
+    setup=true;
   }
 }
 
 void calibrate(){
   
  go.drawButton();
- 
+ back.drawButton();
   if(goPressed){
-    
-    drawTimer((millis()-time)/1000);
+    currentTime = (millis()-time)/1000;
+    drawTimer(currentTime);
   }
+  else{
+    
+    drawTimer(currentTime);
+  }
+    
 }
+
 
 void drawTimer(float time){
   textAlign(CENTER);
