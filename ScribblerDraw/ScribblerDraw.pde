@@ -10,9 +10,13 @@ int readpointer=0;
 int yLocation;
 int xLocation;
 int state = 0;
+float time=0;
 boolean setup=true;
+boolean goPressed=false;
 Button calibrate;
 Button drawNow;
+Button go;
+Button stop;
 void setup(){
   background(255);
   size(800,800);
@@ -21,6 +25,7 @@ void setup(){
  // myPort = new Serial(this, "COM17");
   calibrate=new Button(5,"Calibrate",xLocation, height-2*yLocation, 48);
   drawNow= new Button(30,"Begin Drawing", xLocation, height-yLocation, 48);
+  go = new Button(34,"GO", xLocation,height-2*yLocation, 50);
   //println(location);
 }
 
@@ -32,14 +37,23 @@ void draw(){
   }
   
   if(state==1){
+    if(setup){
+       background(100);
+       setup=false;
+    }
+    background(100);
+    calibrate();
+    
+    
   }
 
 
-  if(state==2){
+  if(state==3){
     if(setup){
-    background=(100);
+    background(100);
     setup=false;
     }
+   
     paint();
   }
   
@@ -114,14 +128,33 @@ void paint(){
 void mousePressed(){
   if (calibrate.rectOver){
     state=1;
+    setup=true;
   }
   if(drawNow.rectOver){
     state=2;
+    setup=true;
+  }
+  if(go.rectOver){
+    go=new Button(3, "STOP", go.rectX, go.rectY, go.textSize);
+    time=millis();
+    goPressed=!goPressed;
   }
 }
 
 void calibrate(){
   
+ go.drawButton();
+ 
+  if(goPressed){
+    
+    drawTimer(millis()-time);
+  }
+}
+
+void drawTimer(float time){
+  textAlign(CENTER);
+  text(time,xLocation,height-yLocation);
+  textAlign(BASELINE);
 }
 
 

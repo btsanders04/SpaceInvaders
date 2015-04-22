@@ -36,14 +36,14 @@ void drawButton() {
   stroke(255);
   textSize(textSize);
   rectMode(CENTER);
-  rect(rectX, rectY, textWidth(label)+3*buffer, textAscent()+textDescent()+3*buffer);
+  rect(rectX, rectY, textWidth(label)+buffer, textAscent()+textDescent()+buffer);
   fill(0);
   text(label,rectX-textWidth(label)/2,rectY+textAscent()/2);
 }
 
 void update(int x, int y) {
- if ( overRect(rectX-(textWidth(label)+3*buffer)/2, rectY-(textAscent()+textDescent()+3*buffer)/2,
-      (textWidth(label)+3*buffer),(textAscent()+textDescent() + 3*buffer)) ) {
+ if ( overRect(rectX-(textWidth(label)+buffer)/2, rectY-(textAscent()+textDescent()+buffer)/2,
+      (textWidth(label)+buffer),(textAscent()+textDescent() + buffer)) ) {
     rectOver = true;
   } else {
     rectOver = false;
