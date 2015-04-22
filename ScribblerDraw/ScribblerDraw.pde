@@ -71,8 +71,6 @@ void setup(){
 
 void draw(){
   
-  
-  
   //start page
   if(state==0){
     if(setup){
@@ -110,31 +108,9 @@ void draw(){
   //System.out.println("X: " + x + " Y: " + y + " Pen: " + penDown);
 }
 
-float currentX=0;
-float currentY=0;
-double startAngle=0.0;
-
-double findAngle(byte x, byte y){
- 
- double theta = (atan(((float)y-currentY)/((float)x-currentX)))*(180/PI);
- double angle=theta-startAngle;
-//  startAngle=theta;
-  return angle;
-}
-
-void serialEvent(Serial thePort){
-  thePort.read();
-  if(readpointer>=dataSize){
-    readpointer=0;
-  }
-   for(int i=0; i<3; i++){
-     myPort.write(data[readpointer][i]);
-   }
-   readpointer++;
-}
 
 
-
+//draws the start page
 void startPage(){
   textAlign(CENTER);
   textSize(50);
@@ -147,7 +123,7 @@ void startPage(){
 
 
 
-
+//draws the draw page
 void paint(){
   stroke(0);
   
@@ -174,7 +150,7 @@ void paint(){
 }
 
 
-
+//determines the necessary page based on button clicks
 void mousePressed(){
   //System.out.println(calibrate.rectOver);
   if (calibrate.rectOver){
@@ -205,6 +181,7 @@ void mousePressed(){
   }
 }
 
+//draws the calibration page
 void drawCal(){
   
  go.drawButton();
@@ -221,15 +198,45 @@ void drawCal(){
     
 }
 
-void calibrate(float time){
-  
-}
-
-
+//draws the Timer on the calibration page
 void drawTimer(float time){
   textAlign(CENTER);
   text(time,xLocation,height-yLocation);
   textAlign(BASELINE);
 }
+
+
+
+//for arduino code
+float calibrate(float time){
+  return rotations*360/time;
+}
+
+
+float currentX=0;
+float currentY=0;
+double startAngle=0.0;
+
+double findAngle(byte x, byte y){
+ 
+ double theta = (atan(((float)y-currentY)/((float)x-currentX)))*(180/PI);
+ double angle=theta-startAngle;
+//  startAngle=theta;
+  return angle;
+}
+
+void serialEvent(Serial thePort){
+  thePort.read();
+  if(readpointer>=dataSize){
+    readpointer=0;
+  }
+   for(int i=0; i<3; i++){
+     myPort.write(data[readpointer][i]);
+   }
+   readpointer++;
+}
+
+
+
 
 
