@@ -176,7 +176,7 @@ void mousePressed(){
   else if(back.rectOver){
     state=0;
    // println(currentTime);
-   calibrate(time);
+    calibrate(time);
     setup=true;
   }
 }
@@ -190,6 +190,10 @@ void drawCal(){
     
     time = (millis()-currentTime)/1000;
     drawTimer(time);
+    
+    //send arduino code to turn in place
+    
+    
   }
   else{
     
