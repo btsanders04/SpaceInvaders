@@ -7,18 +7,20 @@
 int bluetoothTx = 2;  // TX-O pin of bluetooth mate, Arduino D2
 int bluetoothRx = 3;  // RX-I pin of bluetooth mate, Arduino D3
 double startAngle=0.0;
-float currentX=0;
-float currentY=0;
+double currentX=0;
+double currentY=0;
 SoftwareSerial bluetooth(bluetoothTx, bluetoothRx);
 Servo myservo;
 int x;
 int y;
-int dropPen=0;
+int state;
 const int enableL=7;
 const int enableR=9;
 const int motor_left[] = {12,13};
 const int motor_right[] = {11,10};
 
+float time;
+boolean drive=false;
 
 void setup()
 {
@@ -33,7 +35,10 @@ void setup()
   }
   myservo.attach(8);
   myservo.write(90);
- 
+  drive_forward(1000);
+  turnMotor(45);
+  drive_backward(500);
+  turnMotor(720);
  //Serial.println(findAngle(5,5));
   //turnMotor(45);
   /*
@@ -49,31 +54,55 @@ void setup()
    
 }
 
+
+int START_CALIB = 100;
+int STOP_CALIB = 200;
+int GO_TO = 300;
+int PEN_UP = 400;
+int PEN_DOWN = 500;
+int DONE = 900;
+
 void loop() {
   
  //drive_forward();
-  Serial.write(1);
-  if(Serial.available()>2){
-    x = Serial.read();
-    y = Serial.read();
-   dropPen = Serial.read();
-   double theta = findAngle((double)x, (double)y);
-   turnMotor(theta);
- //  driveFoward(findMag((double)x, (double)y);
-   //stopMotor();
-   //Serial.println(theta); 
-   
-   //Serial.println("HEY DARE");
-   
-  // digitalWrite(LMotor,HIGH);
+ if(drive){
+     double theta = findAngle((double)x, (double)y);
+     double mag = findMag((double)x, (double)y);
+     turnMotor(theta);
+     //figure out how mag corresponds to time
+     drive_forward(mag);
+     drive=false;
+ }
+ Serial.write("DONE");
+     //Serial.println(theta); 
+     
+    // digitalWrite(LMotor,HIGH);
+       
+}
+
+void serialEvent() {
+   byte cmd = Serial.readString();
+   if (cmd == START_CAL) {
+     calibrate();
+   } else if (cmd == GO_TO) {
+     while (Serial.available() < 2) { /* wait */ }
+     x=Serial.read();
+     y=Serial.read();
+     drive=true;
+   } else if (cmd == STOP_CAL){
+     motor_stop();
    }
-   
- 
 }
 
 
-double findAngle(byte x, byte y){
- double theta = (atan(((float)y-currentY)/((float)x-currentX)))*(180/PI);
+void calibrate(){
+  time = millis()-currentTime;
+  turn_left();
+}
+
+
+double findAngle(double x, double y){
+ double theta = (atan((y-currentY)/(x-currentX)))*(180/PI);
  double angle=theta-startAngle;
   startAngle=theta;
   return angle;
