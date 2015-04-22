@@ -34,7 +34,7 @@ void drawButton() {
     fill(rectColor);
   }
   stroke(0);
-  weight(2);
+  strokeWeight(2);
   textSize(textSize);
   rectMode(CENTER);
   rect(rectX, rectY, textWidth(label)+buffer, textAscent()+textDescent()+buffer);

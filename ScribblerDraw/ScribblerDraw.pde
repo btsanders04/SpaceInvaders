@@ -3,6 +3,10 @@ Serial myPort;
 int x;
 int y;
 
+
+//background img
+PImage bg;
+
 //if pen is down or not;
 boolean penDown;
 
@@ -55,15 +59,16 @@ Button back;
 
 
 void setup(){
-  background(255);
-  size(800,800);
+  bg=loadImage("scribbles.jpg");
+ // background(255);
+  size(bg.width,bg.height);
   yLocation=height/4;
   xLocation=width/2;
  // myPort = new Serial(this, "COM17");
-  calibrate=new Button(5,"Calibrate",xLocation, height-2*yLocation, 48);
-  drawNow= new Button(30,"Begin Drawing", xLocation, height-yLocation, 48);
-  go = new Button(34,"Start", xLocation,height-2*yLocation, 50);
-  back = new Button(50,"Finish", xLocation,height-3*yLocation,60);
+  calibrate=new Button(5,"Calibrate",xLocation, height-2*yLocation, 24);
+  drawNow= new Button(30,"Begin Drawing", xLocation, height-yLocation, 24);
+  go = new Button(34,"Start", xLocation,height-2*yLocation, 24);
+  back = new Button(50,"Finish", xLocation,height-3*yLocation,24);
   //println(location);
 }
 
@@ -74,7 +79,7 @@ void draw(){
   //start page
   if(state==0){
     if(setup){
-      background(100);
+      background(bg);
       setup=false;
     }
     startPage();
@@ -87,7 +92,7 @@ void draw(){
        time=0;
        setup=false;
     }
-    background(100);
+    background(bg);
     drawCal();
     
     
@@ -112,9 +117,18 @@ void draw(){
 
 //draws the start page
 void startPage(){
+  
   textAlign(CENTER);
-  textSize(50);
-  text("Welcome to Scribble",xLocation, height-3*yLocation);
+  textSize(24);
+  String t="Welcome to Scribble";
+  
+  pushMatrix();
+  fill(100);
+  rectMode(CENTER);
+  rect(xLocation,height-3*yLocation,xLocation + textWidth(t)/2, 2*(textAscent()));
+  fill(0);
+  text(t,xLocation, height-3*yLocation);
+  popMatrix();
   textAlign(BASELINE);
   calibrate.drawButton();
   drawNow.drawButton();
@@ -183,7 +197,17 @@ void mousePressed(){
 
 //draws the calibration page
 void drawCal(){
-  
+  textAlign(CENTER);
+   textSize(24);
+  String t = "Rotate " + rotations + " times";
+   pushMatrix();
+  fill(100);
+  rectMode(CENTER);
+  rect(xLocation,height-3.5*yLocation,xLocation + textWidth(t)/2, 2*(textAscent()));
+  fill(0);
+  text(t,xLocation, height-3.5*yLocation);
+  popMatrix();
+  textAlign(BASELINE);
  go.drawButton();
  back.drawButton();
   if(goPressed){
@@ -205,7 +229,13 @@ void drawCal(){
 //draws the Timer on the calibration page
 void drawTimer(float time){
   textAlign(CENTER);
-  text(time,xLocation,height-yLocation);
+   pushMatrix();
+  fill(100);
+  rectMode(CENTER);
+  rect(xLocation,height-yLocation,xLocation + textWidth((char)time)/2, 2*(textAscent()));
+  fill(0);
+  text(time,xLocation, height-yLocation);
+  popMatrix();
   textAlign(BASELINE);
 }
 
