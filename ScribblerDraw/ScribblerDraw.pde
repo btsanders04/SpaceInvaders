@@ -45,7 +45,7 @@ void draw(){
   
   if(state==1){
     if(setup){
-       //background(100);
+       currentTime=0;
        setup=false;
     }
     background(100);
@@ -174,6 +174,7 @@ void drawCal(){
 }
 
 void calibrate(float time){
+  
 }
 
 
