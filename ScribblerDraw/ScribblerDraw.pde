@@ -100,6 +100,7 @@ void draw(){
 
   //draw page
   if(state==2){
+    println(setup);
     if(setup){
     background(100);
     setup=false;
@@ -154,8 +155,8 @@ void paint(){
     data[writepointer][2]=1;
     }
     else data[writepointer][2]=0;
-    println(data[writepointer][0] + " " + data[writepointer][1] + " " +  data[writepointer][2] + " " 
-    + findAngle(data[writepointer][0], data[writepointer][1]));
+   // println(data[writepointer][0] + " " + data[writepointer][1] + " " +  data[writepointer][2] + " " 
+   // + findAngle(data[writepointer][0], data[writepointer][1]));
     writepointer++;
     line(x,y,pmouseX,pmouseY);
   
@@ -166,6 +167,7 @@ void paint(){
 
 //determines the necessary page based on button clicks
 void mousePressed(){
+  if(state!=2){
   //System.out.println(calibrate.rectOver);
   if (calibrate.rectOver){
     state=1;
@@ -192,6 +194,7 @@ void mousePressed(){
    // println(currentTime);
     calibrate(time);
     setup=true;
+  }
   }
 }
 
