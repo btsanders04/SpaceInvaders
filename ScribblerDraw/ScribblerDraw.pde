@@ -2,23 +2,60 @@ import processing.serial.*;
 Serial myPort;
 int x;
 int y;
+//number of rotations of robot;
+int rotations=10;
+
+//if pen is down or not;
 boolean penDown;
+
+//size of queue
 int dataSize=10000;
 byte[][] data = new byte[dataSize][3];
+
+//iterate through the queue based on new data being written in 
 int writepointer = 0;
+//iterate through queue based on data being read by robot
 int readpointer=0;
+
+//baseline location for buttons
 int yLocation;
 int xLocation;
+
+//determines which page is currently shown
 int state = 0;
+
+//the timer associated with calibrate. used to determine how long scribbler takes to make [rotations]
 float time=0;
+
+//current Time calculated in calibration to set relative timer
 float currentTime=0;
+
+//number of rotations of scribbler used with [time] to determine calibration
+int rotations=10;
+
+
+//true in order to initialize each page, otherwise false
 boolean setup=true;
+
+//determines if Start button is either [START] or [STOP]
 boolean goPressed=false;
+
+//Calibration button on start Page
 Button calibrate;
+
+//Drawing button on Start page
 Button drawNow;
+
+//Start Button on Calibration page
 Button go;
+
+//Stop Button on Calibration Page
 Button stop;
+
+//Back button on Calibration page
 Button back;
+
+
 void setup(){
   background(255);
   size(800,800);
@@ -35,6 +72,8 @@ void setup(){
 void draw(){
   
   
+  
+  //start page
   if(state==0){
     if(setup){
       background(100);
@@ -43,9 +82,11 @@ void draw(){
     startPage();
   }
   
+  
+  //calibration page
   if(state==1){
     if(setup){
-       currentTime=0;
+       time=0;
        setup=false;
     }
     background(100);
@@ -54,7 +95,7 @@ void draw(){
     
   }
 
-
+  //draw page
   if(state==2){
     if(setup){
     background(100);
@@ -92,6 +133,8 @@ void serialEvent(Serial thePort){
    readpointer++;
 }
 
+
+
 void startPage(){
   textAlign(CENTER);
   textSize(50);
@@ -101,6 +144,9 @@ void startPage(){
   drawNow.drawButton();
    
 }
+
+
+
 
 void paint(){
   stroke(0);
@@ -127,6 +173,8 @@ void paint(){
   else penDown=false;
 }
 
+
+
 void mousePressed(){
   //System.out.println(calibrate.rectOver);
   if (calibrate.rectOver){
@@ -146,13 +194,13 @@ void mousePressed(){
    else{
      go=new Button(3, "Stop", go.rectX, go.rectY, go.textSize);
    }
-    time=millis();
+    currentTime=millis();
     goPressed=!goPressed;
   }
   else if(back.rectOver){
     state=0;
    // println(currentTime);
-   calibrate(currentTime);
+   calibrate(time);
     setup=true;
   }
 }
@@ -163,12 +211,12 @@ void drawCal(){
  back.drawButton();
   if(goPressed){
     
-    currentTime = (millis()-time)/1000;
-    drawTimer(currentTime);
+    time = (millis()-currentTime)/1000;
+    drawTimer(time);
   }
   else{
     
-    drawTimer(currentTime);
+    drawTimer(time);
   }
     
 }
