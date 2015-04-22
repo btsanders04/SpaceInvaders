@@ -4,6 +4,15 @@ int x;
 int y;
 
 
+/*protocol
+0=start driving/drawing mode
+1=Start Calibration
+2= Stop Calibration
+*/
+
+//Command string that comes from the Arduino
+int cmd;
+
 //background img
 PImage bg;
 
@@ -64,7 +73,7 @@ void setup(){
   size(bg.width,bg.height);
   yLocation=height/4;
   xLocation=width/2;
- // myPort = new Serial(this, "COM17");
+  myPort = new Serial(this, "COM17");
   calibrate=new Button(5,"Calibrate",xLocation, height-2*yLocation, 24);
   drawNow= new Button(30,"Begin Drawing", xLocation, height-yLocation, 24);
   go = new Button(34,"Start", xLocation,height-2*yLocation, 24);
@@ -75,19 +84,23 @@ void setup(){
 
 
 void draw(){
-  
+ // println(state);
   //start page
-  if(state==0){
+  switch(state){
+  
+    
+ case 0 :{
     if(setup){
       background(bg);
       setup=false;
     }
     startPage();
   }
+  break;
   
   
   //calibration page
-  if(state==1){
+  case 1: {
     if(setup){
        time=0;
        setup=false;
@@ -97,10 +110,11 @@ void draw(){
     
     
   }
+  break;
 
   //draw page
-  if(state==2){
-    println(setup);
+  case 2: {
+    //println(setup);
     if(setup){
     background(100);
     setup=false;
@@ -108,8 +122,9 @@ void draw(){
    
     paint();
   }
+  break;
   
-  
+  } 
   
   //System.out.println("X: " + x + " Y: " + y + " Pen: " + penDown);
 }
@@ -140,6 +155,7 @@ void startPage(){
 
 //draws the draw page
 void paint(){
+  myPort.write(0);
   stroke(0);
   
   if(writepointer>=dataSize){
@@ -158,8 +174,9 @@ void paint(){
    // println(data[writepointer][0] + " " + data[writepointer][1] + " " +  data[writepointer][2] + " " 
    // + findAngle(data[writepointer][0], data[writepointer][1]));
     writepointer++;
+    println(writepointer);
     line(x,y,pmouseX,pmouseY);
-  
+   // println(data[readpointer][0] + " " + data[readpointer][1]);
   }
   else penDown=false;
 }
@@ -180,10 +197,12 @@ void mousePressed(){
   }
   else if(go.rectOver){
    if(goPressed){
+     myPort.write(1);
      go = new Button(34,"Start", go.rectX,go.rectY, go.textSize);
     
    }
    else{
+     myPort.write(1);
      go=new Button(3, "Stop", go.rectX, go.rectY, go.textSize);
    }
     currentTime=millis();
@@ -191,8 +210,8 @@ void mousePressed(){
   }
   else if(back.rectOver){
     state=0;
+    myPort.write(2);
    // println(currentTime);
-    calibrate(time);
     setup=true;
   }
   }
@@ -218,13 +237,14 @@ void drawCal(){
     time = (millis()-currentTime)/1000;
     drawTimer(time);
     
+    
+    //special byte to tell arduino to calibrate
+   
     //send arduino code to turn in place
-    
-    
   }
   else{
-    
     drawTimer(time);
+    myPort.write(2);
   }
     
 }
@@ -263,14 +283,21 @@ double findAngle(byte x, byte y){
 }
 
 void serialEvent(Serial thePort){
-  thePort.read();
+  
+  cmd = thePort.read();
+  println(readpointer);
+  if(cmd == 1){
+    thePort.write(0);
+    if(readpointer<=writepointer){
+       readpointer++;
+    }
+    thePort.write(data[readpointer][0]);
+    thePort.write(data[readpointer][1]);
+       
+  }
   if(readpointer>=dataSize){
     readpointer=0;
   }
-   for(int i=0; i<3; i++){
-     myPort.write(data[readpointer][i]);
-   }
-   readpointer++;
 }
 
 

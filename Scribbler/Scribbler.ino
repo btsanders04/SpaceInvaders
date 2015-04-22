@@ -4,23 +4,55 @@
 #include <math.h>
 #include <Servo.h>
 
+
+
+//software serial for bluetooth
 int bluetoothTx = 2;  // TX-O pin of bluetooth mate, Arduino D2
 int bluetoothRx = 3;  // RX-I pin of bluetooth mate, Arduino D3
+
+//angle the scribbler starts at
 double startAngle=0.0;
+
+//scribblers starting position
 double currentX=0;
 double currentY=0;
+
+
 SoftwareSerial bluetooth(bluetoothTx, bluetoothRx);
+
+//pen servo
 Servo myservo;
+
+
+//data that comes in to tell the scribbler where to go
 int x;
 int y;
+
+//state the scribbler should be in. StartPage, Draw, or Calibrate
 int state;
+
+//hardcoded calibration turns
+int rotations=10;
+
+//degrees/millisecond from calibration
+float vangle;
+
+//time used in calibration
+float currentTime;
+
+//motor pins
 const int enableL=7;
 const int enableR=9;
 const int motor_left[] = {12,13};
 const int motor_right[] = {11,10};
 
+
+//time received from calibration
 float time;
+
+//control booleans to tell whether to drive or calibrate
 boolean drive=false;
+boolean cali=false;
 
 void setup()
 {
@@ -35,10 +67,10 @@ void setup()
   }
   myservo.attach(8);
   myservo.write(90);
-  drive_forward(1000);
-  turnMotor(45);
-  drive_backward(500);
-  turnMotor(720);
+ // drive_forward(1000);
+ // turnMotor(45);
+ // drive_backward(500);
+ // turnMotor(720);
  //Serial.println(findAngle(5,5));
   //turnMotor(45);
   /*
@@ -55,25 +87,26 @@ void setup()
 }
 
 
-int START_CALIB = 100;
-int STOP_CALIB = 200;
-int GO_TO = 300;
-int PEN_UP = 400;
-int PEN_DOWN = 500;
-int DONE = 900;
-
 void loop() {
   
  //drive_forward();
  if(drive){
+   //  Serial.println("GOT HERE");
      double theta = findAngle((double)x, (double)y);
      double mag = findMag((double)x, (double)y);
+   //  Serial.print(theta);
+  //   Serial.print(mag);
      turnMotor(theta);
      //figure out how mag corresponds to time
      drive_forward(mag);
      drive=false;
+     Serial.write(1);
  }
- Serial.write("DONE");
+ else if(cali){
+   calibrate();
+  // calibrate=false;
+ }
+ 
      //Serial.println(theta); 
      
     // digitalWrite(LMotor,HIGH);
@@ -81,16 +114,20 @@ void loop() {
 }
 
 void serialEvent() {
-   byte cmd = Serial.readString();
-   if (cmd == START_CAL) {
-     calibrate();
-   } else if (cmd == GO_TO) {
+   int cmd = Serial.read();
+   if (cmd == 1 ) { //Start Calibration
+     currentTime=millis();
+     cali=true;
+   } else if (cmd == 0) {  //Start Drive Mode
      while (Serial.available() < 2) { /* wait */ }
      x=Serial.read();
      y=Serial.read();
      drive=true;
-   } else if (cmd == STOP_CAL){
+   } else if (cmd == 2){  //Stop Calibration
+     cali=false;
      motor_stop();
+     //Serial.print(time);
+     vangle=360*rotations/time;
    }
 }
 
@@ -123,7 +160,7 @@ void lowerPen(boolean lower)
 void turnMotor(double angle)
 {
   int startTime=millis();
-  while(millis()-startTime<(angle*100)/12){
+  while(millis()-startTime<angle/vangle){
   if(angle<180.0){
     turn_left();
   }
@@ -146,7 +183,7 @@ delay(25);
 
 void drive_forward(int time){
   int currentTime=millis();
-  while((millis()-currentTime)<time){
+  while((millis()-currentTime)<(time*100)){
 digitalWrite(motor_left[0], HIGH);
 digitalWrite(motor_left[1], LOW);
 
