@@ -2,8 +2,6 @@ import processing.serial.*;
 Serial myPort;
 int x;
 int y;
-//number of rotations of robot;
-int rotations=10;
 
 //if pen is down or not;
 boolean penDown;
@@ -68,6 +66,8 @@ void setup(){
   back = new Button(50,"Finish", xLocation,height-3*yLocation,60);
   //println(location);
 }
+
+
 
 void draw(){
   
