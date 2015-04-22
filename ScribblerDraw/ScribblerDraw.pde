@@ -27,7 +27,7 @@ void setup(){
  // myPort = new Serial(this, "COM17");
   calibrate=new Button(5,"Calibrate",xLocation, height-2*yLocation, 48);
   drawNow= new Button(30,"Begin Drawing", xLocation, height-yLocation, 48);
-  go = new Button(34,"GO", xLocation,height-2*yLocation, 50);
+  go = new Button(34,"Start", xLocation,height-2*yLocation, 50);
   back = new Button(50,"Finish", xLocation,height-3*yLocation,60);
   //println(location);
 }
@@ -49,7 +49,7 @@ void draw(){
        setup=false;
     }
     background(100);
-    calibrate();
+    drawCal();
     
     
   }
@@ -98,7 +98,6 @@ void startPage(){
   text("Welcome to Scribble",xLocation, height-3*yLocation);
   textAlign(BASELINE);
   calibrate.drawButton();
-  System.out.println(calibrate.rectOver);
   drawNow.drawButton();
    
 }
@@ -140,21 +139,30 @@ void mousePressed(){
     setup=true;
   }
   else if(go.rectOver){
-    go=new Button(3, "STOP", go.rectX, go.rectY, go.textSize);
+   if(goPressed){
+     go = new Button(34,"Start", go.rectX,go.rectY, go.textSize);
+    
+   }
+   else{
+     go=new Button(3, "Stop", go.rectX, go.rectY, go.textSize);
+   }
     time=millis();
     goPressed=!goPressed;
   }
   else if(back.rectOver){
     state=0;
+   // println(currentTime);
+   calibrate(currentTime);
     setup=true;
   }
 }
 
-void calibrate(){
+void drawCal(){
   
  go.drawButton();
  back.drawButton();
   if(goPressed){
+    
     currentTime = (millis()-time)/1000;
     drawTimer(currentTime);
   }
@@ -163,6 +171,9 @@ void calibrate(){
     drawTimer(currentTime);
   }
     
+}
+
+void calibrate(float time){
 }
 
 
