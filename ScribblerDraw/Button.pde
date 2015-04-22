@@ -33,7 +33,8 @@ void drawButton() {
   } else {
     fill(rectColor);
   }
-  stroke(255);
+  stroke(0);
+  weight(2);
   textSize(textSize);
   rectMode(CENTER);
   rect(rectX, rectY, textWidth(label)+buffer, textAscent()+textDescent()+buffer);
