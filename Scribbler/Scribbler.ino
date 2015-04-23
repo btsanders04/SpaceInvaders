@@ -37,6 +37,12 @@ int rotations=10;
 //degrees/millisecond from calibration
 float vangle;
 
+
+// time sent from processing to tell the arduino what to do
+float turnTime;
+float driveTime;
+
+
 //time used in calibration
 float currentTime;
 
@@ -92,21 +98,21 @@ void loop() {
  //drive_forward();
  if(drive){
    //  Serial.println("GOT HERE");
-     double theta = findAngle((double)x, (double)y);
-     double mag = findMag((double)x, (double)y);
+   //  double theta = findAngle((double)x, (double)y);
+  //   double mag = findMag((double)x, (double)y);
    //  Serial.print(theta);
   //   Serial.print(mag);
-     turnMotor(theta);
+     turnMotor(turnTime);
      //figure out how mag corresponds to time
-     drive_forward(mag);
+     drive_forward(driveTime);
      drive=false;
      Serial.write(1);
  }
- else if(cali){
+ /*else if(cali){
    calibrate();
   // calibrate=false;
  }
- 
+ */
      //Serial.println(theta); 
      
     // digitalWrite(LMotor,HIGH);
@@ -116,39 +122,39 @@ void loop() {
 void serialEvent() {
    int cmd = Serial.read();
    if (cmd == 1 ) { //Start Calibration
-     currentTime=millis();
-     cali=true;
+     turn_left();
+    // currentTime=millis();
+    // cali=true;
    } else if (cmd == 0) {  //Start Drive Mode
-     while (Serial.available() < 2) { /* wait */ }
-     x=Serial.read();
-     y=Serial.read();
+     while (Serial.available() < 3) { /* wait */ }
+     turnTime=Serial.read();
+     driveTime=Serial.read();
+     dir=Serial.read();
      drive=true;
    } else if (cmd == 2){  //Stop Calibration
-     cali=false;
      motor_stop();
-     //Serial.print(time);
-     vangle=360*rotations/time;
+    // vangle=360*rotations/time;
    }
 }
 
-
+/*
 void calibrate(){
   time = millis()-currentTime;
   turn_left();
 }
 
-
+/*
 double findAngle(double x, double y){
  double theta = (atan((y-currentY)/(x-currentX)))*(180/PI);
  double angle=theta-startAngle;
   startAngle=theta;
   return angle;
 }
-
+/*
 double findMag(double x, double y){
   return sqrt(sq(x-currentX)+sq(y-currentY));
 }
-
+*/
 void lowerPen(boolean lower)
 {
   if(lower)
@@ -157,14 +163,14 @@ void lowerPen(boolean lower)
   myservo.write( 90);
 }
 
-void turnMotor(double angle)
+void turnMotor(float time, int dir)
 {
   int startTime=millis();
-  while(millis()-startTime<angle/vangle){
-  if(angle<180.0){
+  while(millis()-startTime <time){
+  if(dir==0){
     turn_left();
   }
-  else {
+  else (if dir == 1){
    turn_right();
   }
   }
@@ -178,7 +184,7 @@ digitalWrite(motor_left[1], LOW);
 
 digitalWrite(motor_right[0], LOW);
 digitalWrite(motor_right[1], LOW);
-delay(25);
+//delay(25);
 }
 
 void drive_forward(int time){

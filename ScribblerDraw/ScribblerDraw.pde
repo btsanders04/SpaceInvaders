@@ -10,6 +10,11 @@ int y;
 2= Stop Calibration
 */
 
+
+//size of paper
+int pLength;
+int pWidth;
+
 //Command string that comes from the Arduino
 int cmd;
 
@@ -19,9 +24,14 @@ PImage bg;
 //if pen is down or not;
 boolean penDown;
 
+//tells arduino how much to move
+float turnTime;
+float drivetime;
+int dir;
+
 //size of queue
 int dataSize=10000;
-byte[][] data = new byte[dataSize][3];
+byte[][] data = new byte[dataSize][4];
 
 //iterate through the queue based on new data being written in 
 int writepointer = 0;
@@ -34,6 +44,9 @@ int xLocation;
 
 //determines which page is currently shown
 int state = 0;
+
+//calibration angle
+float vangle;
 
 //the timer associated with calibrate. used to determine how long scribbler takes to make [rotations]
 float time=0;
@@ -165,12 +178,18 @@ void paint(){
     x = mouseX;
     y = mouseY;
     penDown=true;
-    data[writepointer][0]=(byte)(x/8);
-    data[writepointer][1]=(byte)(y/8);
+    data[writepointer][0]=findAngleTime(int x, int y);
+    data[writepointer][1]=findMagTime(int x, int y);
+    if(data[writepointer][0]/vangle<180){
+      data[writepointer[2]=0;
+      ]
+    else data[writepointer[2]=1;
+   // data[writepointer][0]=(byte)(x/8);
+   // data[writepointer][1]=(byte)(y/8);
     if(penDown){
-    data[writepointer][2]=1;
+    data[writepointer][3]=1;
     }
-    else data[writepointer][2]=0;
+    else data[writepointer][3]=0;
    // println(data[writepointer][0] + " " + data[writepointer][1] + " " +  data[writepointer][2] + " " 
    // + findAngle(data[writepointer][0], data[writepointer][1]));
     writepointer++;
@@ -244,6 +263,7 @@ void drawCal(){
   }
   else{
     drawTimer(time);
+    vangle=3600/time;
     myPort.write(2);
   }
     
@@ -265,6 +285,7 @@ void drawTimer(float time){
 
 
 //for arduino code
+
 float calibrate(float time){
   return rotations*360/time;
 }
@@ -274,26 +295,38 @@ float currentX=0;
 float currentY=0;
 double startAngle=0.0;
 
-double findAngle(byte x, byte y){
+double findAngleTime(int x, int y){
  
  double theta = (atan(((float)y-currentY)/((float)x-currentX)))*(180/PI);
  double angle=theta-startAngle;
-//  startAngle=theta;
-  return angle;
+ 
+  startAngle=theta;
+  return angle*vangle;
 }
+
+
+
+
+double findMagTime(double x, double y){
+  return (sqrt(sq(x-currentX)+sq(y-currentY)))*driveTime;
+}
+
+
 
 void serialEvent(Serial thePort){
   
   cmd = thePort.read();
-  println(readpointer);
+ // println(readpointer);
   if(cmd == 1){
     thePort.write(0);
     if(readpointer<=writepointer){
        readpointer++;
     }
-    thePort.write(data[readpointer][0]);
-    thePort.write(data[readpointer][1]);
-       
+    //thePort.write(data[readpointer][0]);
+    //thePort.write(data[readpointer][1]);
+      thePort.write(turnTime);
+      thePort.write(driveTime);
+      thePort.write(dir); 
   }
   if(readpointer>=dataSize){
     readpointer=0;
