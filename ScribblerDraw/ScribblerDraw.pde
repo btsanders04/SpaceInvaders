@@ -3,12 +3,7 @@ Serial myPort;
 int x;
 int y;
 
-
-/*protocol
-0=start driving/drawing mode
-1=Start Calibration
-2= Stop Calibration
-*/
+Serial bluetooth;
 
 
 //size of paper
@@ -26,12 +21,12 @@ boolean penDown;
 
 //tells arduino how much to move
 float turnTime;
-float drivetime;
+float driveTime;
 int dir;
 
 //size of queue
 int dataSize=10000;
-byte[][] data = new byte[dataSize][4];
+float[][] data = new float[dataSize][4];
 
 //iterate through the queue based on new data being written in 
 int writepointer = 0;
@@ -86,11 +81,13 @@ void setup(){
   size(bg.width,bg.height);
   yLocation=height/4;
   xLocation=width/2;
-  myPort = new Serial(this, "COM17");
+ // myPort = new Serial(this, "COM17");
+  bluetooth = new Serial(this, "COM23");
   calibrate=new Button(5,"Calibrate",xLocation, height-2*yLocation, 24);
   drawNow= new Button(30,"Begin Drawing", xLocation, height-yLocation, 24);
   go = new Button(34,"Start", xLocation,height-2*yLocation, 24);
   back = new Button(50,"Finish", xLocation,height-3*yLocation,24);
+ 
   //println(location);
 }
 
@@ -168,7 +165,7 @@ void startPage(){
 
 //draws the draw page
 void paint(){
-  myPort.write(0);
+  bluetooth.write(0);
   stroke(0);
   
   if(writepointer>=dataSize){
@@ -178,14 +175,12 @@ void paint(){
     x = mouseX;
     y = mouseY;
     penDown=true;
-    data[writepointer][0]=findAngleTime(int x, int y);
-    data[writepointer][1]=findMagTime(int x, int y);
+    data[writepointer][0]=findAngleTime(x, y);
+    data[writepointer][1]=findMagTime(x, y);
     if(data[writepointer][0]/vangle<180){
-      data[writepointer[2]=0;
-      ]
-    else data[writepointer[2]=1;
-   // data[writepointer][0]=(byte)(x/8);
-   // data[writepointer][1]=(byte)(y/8);
+      data[writepointer][2]=0;
+    }
+    else data[writepointer][2]=1;
     if(penDown){
     data[writepointer][3]=1;
     }
@@ -216,12 +211,12 @@ void mousePressed(){
   }
   else if(go.rectOver){
    if(goPressed){
-     myPort.write(1);
+     bluetooth.write(1);
      go = new Button(34,"Start", go.rectX,go.rectY, go.textSize);
     
    }
    else{
-     myPort.write(1);
+     bluetooth.write(1);
      go=new Button(3, "Stop", go.rectX, go.rectY, go.textSize);
    }
     currentTime=millis();
@@ -229,7 +224,7 @@ void mousePressed(){
   }
   else if(back.rectOver){
     state=0;
-    myPort.write(2);
+    bluetooth.write(2);
    // println(currentTime);
     setup=true;
   }
@@ -264,7 +259,7 @@ void drawCal(){
   else{
     drawTimer(time);
     vangle=3600/time;
-    myPort.write(2);
+    bluetooth.write(2);
   }
     
 }
@@ -293,12 +288,12 @@ float calibrate(float time){
 
 float currentX=0;
 float currentY=0;
-double startAngle=0.0;
+float startAngle=0.0;
 
-double findAngleTime(int x, int y){
+float findAngleTime(int x, int y){
  
- double theta = (atan(((float)y-currentY)/((float)x-currentX)))*(180/PI);
- double angle=theta-startAngle;
+ float theta = (atan(((float)y-currentY)/((float)x-currentX)))*(180/PI);
+ float angle=theta-startAngle;
  
   startAngle=theta;
   return angle*vangle;
@@ -307,10 +302,13 @@ double findAngleTime(int x, int y){
 
 
 
-double findMagTime(double x, double y){
-  return (sqrt(sq(x-currentX)+sq(y-currentY)))*driveTime;
+float findMagTime(double x, double y){
+  return (sqrt(sq((float)(x-currentX))+sq((float)(y-currentY))))*driveTime;
 }
 
+void sendBluetooth(){
+  bluetooth.write("HELLO World");
+}
 
 
 void serialEvent(Serial thePort){
@@ -322,11 +320,11 @@ void serialEvent(Serial thePort){
     if(readpointer<=writepointer){
        readpointer++;
     }
-    //thePort.write(data[readpointer][0]);
-    //thePort.write(data[readpointer][1]);
-      thePort.write(turnTime);
-      thePort.write(driveTime);
-      thePort.write(dir); 
+    thePort.write((int)data[readpointer][0]);
+    thePort.write((int)data[readpointer][1]);
+    thePort.write((int)turnTime);
+    thePort.write((int)driveTime);
+    thePort.write(dir); 
   }
   if(readpointer>=dataSize){
     readpointer=0;

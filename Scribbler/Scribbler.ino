@@ -24,6 +24,9 @@ SoftwareSerial bluetooth(bluetoothTx, bluetoothRx);
 Servo myservo;
 
 
+//direction to turn motor
+int dir;
+
 //data that comes in to tell the scribbler where to go
 int x;
 int y;
@@ -79,7 +82,7 @@ void setup()
  // turnMotor(720);
  //Serial.println(findAngle(5,5));
   //turnMotor(45);
-  /*
+  
   bluetooth.begin(115200);  // The Bluetooth Mate defaults to 115200bps
   bluetooth.print("$");  // Print three times individually
   bluetooth.print("$");
@@ -88,53 +91,44 @@ void setup()
   bluetooth.println("U,9600,N");  // Temporarily Change the baudrate to 9600, no parity
   // 115200 can be too fast at times for NewSoftSerial to relay the data reliably
   bluetooth.begin(9600);  // Start bluetooth serial at 9600
-  */
+  
    
 }
 
 
 void loop() {
   
+  
+// Serial.println(bluetooth.readString());
  //drive_forward();
  if(drive){
-   //  Serial.println("GOT HERE");
-   //  double theta = findAngle((double)x, (double)y);
-  //   double mag = findMag((double)x, (double)y);
-   //  Serial.print(theta);
-  //   Serial.print(mag);
-     turnMotor(turnTime);
+     turnMotor(turnTime, dir);
      //figure out how mag corresponds to time
      drive_forward(driveTime);
      drive=false;
-     Serial.write(1);
+     bluetooth.write(1);
+    // Serial.write(1);
  }
- /*else if(cali){
-   calibrate();
-  // calibrate=false;
- }
- */
-     //Serial.println(theta); 
-     
-    // digitalWrite(LMotor,HIGH);
-       
+
 }
 
 void serialEvent() {
-   int cmd = Serial.read();
+   int cmd = bluetooth.read();
+   Serial.println(cmd);
    if (cmd == 1 ) { //Start Calibration
      turn_left();
-    // currentTime=millis();
-    // cali=true;
    } else if (cmd == 0) {  //Start Drive Mode
-     while (Serial.available() < 3) { /* wait */ }
-     turnTime=Serial.read();
-     driveTime=Serial.read();
-     dir=Serial.read();
+     while (bluetooth.available() < 3) { /* wait */ }
+     turnTime=bluetooth.read();
+     driveTime=bluetooth.read();
+     dir=bluetooth.read();
      drive=true;
+
    } else if (cmd == 2){  //Stop Calibration
      motor_stop();
     // vangle=360*rotations/time;
    }
+      
 }
 
 /*
@@ -170,7 +164,7 @@ void turnMotor(float time, int dir)
   if(dir==0){
     turn_left();
   }
-  else (if dir == 1){
+  else if (dir == 1){
    turn_right();
   }
   }
