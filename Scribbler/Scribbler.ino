@@ -83,13 +83,14 @@ void setup()
  //Serial.println(findAngle(5,5));
   //turnMotor(45);
   
-  bluetooth.begin(115200);  // The Bluetooth Mate defaults to 115200bps
-  bluetooth.print("$");  // Print three times individually
-  bluetooth.print("$");
-  bluetooth.print("$");  // Enter command mode
-  delay(100);  // Short delay, wait for the Mate to send back CMD
-  bluetooth.println("U,9600,N");  // Temporarily Change the baudrate to 9600, no parity
+ bluetooth.begin(115200);  // The Bluetooth Mate defaults to 115200bps
+ bluetooth.print("$");  // Print three times individually
+ bluetooth.print("$");
+ bluetooth.print("$");  // Enter command mode
+ delay(100);  // Short delay, wait for the Mate to send back CMD
+ bluetooth.println("U,9600,N");  // Temporarily Change the baudrate to 9600, no parity
   // 115200 can be too fast at times for NewSoftSerial to relay the data reliably
+  
   bluetooth.begin(9600);  // Start bluetooth serial at 9600
   
    
@@ -97,22 +98,26 @@ void setup()
 
 
 void loop() {
-  
-  
-// Serial.println(bluetooth.readString());
+ 
+  bluetoothSerial();
+  // Serial.println(bluetooth.readString());
  //drive_forward();
+ 
  if(drive){
      turnMotor(turnTime, dir);
      //figure out how mag corresponds to time
      drive_forward(driveTime);
-     drive=false;
+     //drive=false;
      bluetooth.write(1);
+     
     // Serial.write(1);
  }
 
 }
 
-void serialEvent() {
+void bluetoothSerial() {
+  while(bluetooth.available()<1){}
+//  if(bluetooth.available()){
    int cmd = bluetooth.read();
    Serial.println(cmd);
    if (cmd == 1 ) { //Start Calibration
@@ -122,12 +127,16 @@ void serialEvent() {
      turnTime=bluetooth.read();
      driveTime=bluetooth.read();
      dir=bluetooth.read();
+     Serial.println(turnTime);
+     Serial.println(driveTime);
+     Serial.println(dir);
      drive=true;
 
    } else if (cmd == 2){  //Stop Calibration
      motor_stop();
     // vangle=360*rotations/time;
    }
+//  }
       
 }
 
@@ -183,7 +192,7 @@ digitalWrite(motor_right[1], LOW);
 
 void drive_forward(int time){
   int currentTime=millis();
-  while((millis()-currentTime)<(time*100)){
+  while((millis()-currentTime)<time){
 digitalWrite(motor_left[0], HIGH);
 digitalWrite(motor_left[1], LOW);
 
