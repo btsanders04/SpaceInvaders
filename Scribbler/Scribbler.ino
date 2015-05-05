@@ -31,6 +31,9 @@ int dir;
 int x;
 int y;
 
+
+int penToggle=1;
+int previousPen;
 //state the scribbler should be in. StartPage, Draw, or Calibrate
 int state;
 
@@ -102,44 +105,114 @@ void loop() {
   bluetoothSerial();
   // Serial.println(bluetooth.readString());
  //drive_forward();
- 
+
  if(drive){
      turnMotor(turnTime, dir);
      //figure out how mag corresponds to time
      drive_forward(driveTime);
+     lowerPen(penToggle);
      //drive=false;
-     bluetooth.write(1);
+      bluetooth.write(1);
      
-    // Serial.write(1);
+   //  Serial.print("SEND ");
+   //  Serial.println(1);
  }
+   
 
 }
 
 void bluetoothSerial() {
+ 
   while(bluetooth.available()<1){}
 //  if(bluetooth.available()){
    int cmd = bluetooth.read();
-   Serial.println(cmd);
+   if(cmd>3){
+    // Serial.print("CMD ");
+    // Serial.println(cmd);
+   //  bluetooth.read();
+     cmd=0;
+   }
+  // Serial.print("CMD ");
+  // Serial.println(cmd);
    if (cmd == 1 ) { //Start Calibration
      turn_left();
-   } else if (cmd == 0) {  //Start Drive Mode
-     while (bluetooth.available() < 3) { /* wait */ }
+     drive=false;
+   }
+ /*  else if (cmd == 3){
+       automaton();
+     }*/
+    else if (cmd == 0) {  //Start Drive Mode
+     while (bluetooth.available() < 4) { /* wait */ }
+     
      turnTime=bluetooth.read();
+     if(turnTime>100){
+      // Serial.print("TURN ");
+      // Serial.println(turnTime);
+     // Serial.println(turnTime);
+       turnTime=0;
+       
+      // Serial.println();
+     }
+
      driveTime=bluetooth.read();
+     if(driveTime>100){
+     //  Serial.print("DRIVE ");
+      // Serial.println(driveTime);
+       driveTime=0;
+     //  Serial.println(driveTime);
+     //         Serial.println();
+     }
      dir=bluetooth.read();
+     if(dir>1){
+     //  Serial.print("DIRECTION ");
+     //  Serial.println(dir);
+       dir=0;
+      // Serial.println(dir);
+     //  Serial.println();
+     }
+     previousPen=penToggle;
+     penToggle=bluetooth.read();
+     if(penToggle>1){
+     //  Serial.print("PEN ");
+     //  Serial.println(penToggle);
+     
+     //  Serial.println(penToggle);
+        penToggle=0;
+     //  Serial.println();
+     }
+  /*  
+     Serial.println("DATA");  
      Serial.println(turnTime);
      Serial.println(driveTime);
      Serial.println(dir);
+     Serial.println(penToggle);
+     Serial.println();*/
+      while(bluetooth.available()>0){
+     //  Serial.print("EXTRA :");
+       Serial.println(bluetooth.read());
+     }
      drive=true;
 
    } else if (cmd == 2){  //Stop Calibration
      motor_stop();
+     drive=false;
     // vangle=360*rotations/time;
    }
+   
+    
 //  }
       
 }
 
+/*
+void automaton(){
+  for(int i=0;i<10;i++){
+  drive_forward(1000);
+  turnMotor(400, 0);
+  motor_stop();
+  }
+  drive_forward(1000);
+}
 /*
 void calibrate(){
   time = millis()-currentTime;
@@ -158,9 +231,9 @@ double findMag(double x, double y){
   return sqrt(sq(x-currentX)+sq(y-currentY));
 }
 */
-void lowerPen(boolean lower)
+void lowerPen(int lower)
 {
-  if(lower)
+  if(lower==0)
   myservo.write(80);
   else
   myservo.write( 90);
@@ -169,7 +242,7 @@ void lowerPen(boolean lower)
 void turnMotor(float time, int dir)
 {
   int startTime=millis();
-  while(millis()-startTime <time){
+  while((millis()-startTime )< time){
   if(dir==0){
     turn_left();
   }
@@ -177,7 +250,7 @@ void turnMotor(float time, int dir)
    turn_right();
   }
   }
-  motor_stop();
+ // motor_stop();
 }
 
 
@@ -199,6 +272,7 @@ digitalWrite(motor_left[1], LOW);
 digitalWrite(motor_right[0], HIGH);
 digitalWrite(motor_right[1], LOW);
   }
+  motor_stop();
 }
 
 void drive_backward(int time){
