@@ -1,15 +1,32 @@
 import processing.serial.*;
 Serial myPort;
+
+
+
+//position of mouse
 int x;
 int y;
+
+//break up lines into segments 
 int counter=0;
+
+//the most recent position recording sent to the arduino
 float currentX=0;
 float currentY=0;
+
+//the starting angle of the arduino
 float startAngle=0.0;
+
 Serial bluetooth;
+
+//The time sent to the arduino to turn
 float angTime;
+//The time sent to the arduino to drive forward
 float magTime;
+
+//The direction to turn (Left or Right)
 int direction;
+
 //size of paper
 int pLength;
 int pWidth;
@@ -23,9 +40,8 @@ PImage bg;
 //if pen is down or not;
 int penDown;
 
-//tells arduino how much to move
-float turnTime;
-float driveTime=.2;
+//tells arduino how much to move. Calibration constants
+float driveTime=.1;
 int dir;
 
 //size of queue
@@ -78,16 +94,21 @@ Button stop;
 //Back button on Calibration page
 Button back;
 
+
+//Button to go to manual mode
 Button commands;
+
+//Buttons for manual.
 Button forward;
-Button backward;
 Button turnLeft;
 Button turnRight;
 Button penToggle;
-Button lastState;
-float timer;
 
-byte test = 0;
+//Button to return to the previous state
+Button lastState;
+
+//delay for manual mode so not too many data points are recorded when a button is held down
+float timer;
 
 
 void setup(){
@@ -110,6 +131,11 @@ void setup(){
 }
 
 
+//finite state machine. depending on what button is pressed it will be in a different state
+//0 --> start page
+//1 --> calibration
+//2 --> draw line
+//3 --> manual button press
 
 void draw(){
  // println(state);
@@ -187,6 +213,9 @@ void startPage(){
   commands.drawButton();
 }
 
+
+//state where you can drive the arduino with commands. (FORWARD, TURN LEFT, TURN RIGHT)
+//middle button toggles the pen servo up and down
 void manual(){
   int xLoc=width/2;
   int yLoc=height/2;
@@ -227,6 +256,7 @@ void manual(){
                    data[writepointer][1]=0;
                    data[writepointer][2]=1;
                    data[writepointer][3]=penDown;
+                   //println("turnRight");
                    writepointer++;
                   }
               timer=millis();     
@@ -234,7 +264,9 @@ void manual(){
 }
   bluetoothEvent();
 }
-//draws the draw page
+
+
+// state where you can draw a line and the arduino will follow it. Data is written in packets of four put into a queue
 void paint(){
   lastState.drawButton();
   stroke(0);
@@ -260,7 +292,7 @@ void paint(){
       data[writepointer][2]=direction;
       data[writepointer][3]=1;
       angTime-=100;
-       println("BYTE " + (byte)data[writepointer][0] + " " + (byte)data[writepointer][1] + " " + (byte)data[writepointer][2] + " " + (byte)data[writepointer][3]);
+      println("BYTE " + (byte)data[writepointer][0] + " " + (byte)data[writepointer][1] + " " + (byte)data[writepointer][2] + " " + (byte)data[writepointer][3]);
 
       writepointer++;
       
@@ -319,7 +351,7 @@ void paint(){
 //  }
 }
 
-
+/*
 void mouseReleased(){
   if(state==2 && !setup){
     data[writepointer][0]=0;
@@ -331,9 +363,10 @@ void mouseReleased(){
     println("WRITE " + writepointer);
   }
 }
-
+*/
 //determines the necessary page based on button clicks
 void mousePressed(){
+
   switch(state){
     case 0:   if (calibrate.rectOver){
                   state=1;
@@ -341,7 +374,6 @@ void mousePressed(){
                   calibrate.rectOver=false;
     }
          else if(commands.rectOver){
-
                    bluetooth.write(0);
                    bluetooth.write(0);
                    bluetooth.write(0);
@@ -349,7 +381,6 @@ void mousePressed(){
                    bluetooth.write(0);
                    state=3;
                    setup=true;
-                   commands.rectOver=false;
                    delay(100);
     }
          else if(drawNow.rectOver){
@@ -359,51 +390,40 @@ void mousePressed(){
                    bluetooth.write(0);
                    bluetooth.write(0);
                    bluetooth.write(0);
-                   drawNow.rectOver=false;
                    setup=true;
                    state=2;
                    delay(100);
     }
- //   println("BUTToN PRESSED");
+    //println("BUTToN PRESSED");
     break;
     case 1: if(go.rectOver){
                if(goPressed){
-                 //  //bluetooth.write("HELLO");
                   bluetooth.write(2);
-                  //  println("WRITING 1");
                   go = new Button(34,"Start", go.rectX,go.rectY, go.textSize);
                }
            else{
                bluetooth.write(1);
-             //    println("Calibrate");
                go=new Button(3, "Stop", go.rectX, go.rectY, go.textSize);
                }
             currentTime=millis();
             goPressed=!goPressed;
-      //      go.rectOver=false;
              }
             else if(back.rectOver){
                     state=0;
-               // println(currentTime);
                     setup=true;
-        //            back.rectOver=false;
             }    
     break;
     case 2:  if(lastState.rectOver){
                 state=0;
                 bluetooth.write(2);
                 setup=true;
-         //       lastState.rectOver=false;
                 }
-            
-             
                 
     break;
     case 3:  if(lastState.rectOver){
                 state=0;
                 bluetooth.write(2);
                 setup=true;
-          //      lastState.rectOver=false;
                 }
            
               else if(penToggle.rectOver){
@@ -413,9 +433,6 @@ void mousePressed(){
                    data[writepointer][2]=0;
                    data[writepointer][3]=penDown;
                    writepointer++;
-          
-              //     penToggle.rectOver=false;
-                   println("Pen TOGGLE");
             
                   }
              
@@ -423,6 +440,8 @@ void mousePressed(){
     
   }
 }
+
+
 
 //draws the calibration page
 void drawCal(){
@@ -443,11 +462,6 @@ void drawCal(){
     
     time = (millis()-currentTime)/1000;
     drawTimer(time);
-    
-    
-    //special byte to tell arduino to calibrate
-   
-    //send arduino code to turn in place
   }
   else{
     drawTimer(time);
@@ -469,16 +483,7 @@ void drawTimer(float time){
   textAlign(BASELINE);
 }
 
-
-
-//for arduino code
-
-float calibrate(float time){
-  return rotations*360/time;
-}
-
-
-
+//find the time it takes to turn the necessary degrees based on the calibration
 float findAngleTime(int x, int y){
  
  float theta = (atan(((float)y-currentY)/((float)x-currentX)))*(180/PI);
@@ -496,38 +501,35 @@ float findAngleTime(int x, int y){
 
 
 
-
+//finds the time it takes to travel the desired distance
 float findMagTime(double x, double y){
  // println((sqrt(sq((float)(x-currentX))+sq((float)(y-currentY))))*driveTime);
   return (sqrt(sq((float)(x-currentX))+sq((float)(y-currentY))))/driveTime;
 }
 
-
+//communicates with the arduino and sends it each packet of data from the queue as well as a 0 at the start to tell the arduino
+//it is in the drawing state.
 void bluetoothEvent(){
   
   if(bluetooth.available()>0){
-  cmd = bluetooth.read();
-  println(cmd);
-  }
-  
-  if(cmd == 1){
+
+    if(bluetooth.read()==1){
    
-    if(readpointer<writepointer){
+      if(readpointer<writepointer){
     //   println("WRITE " + writepointer);
-   //    println("READ " + readpointer);
-       bluetooth.write(0);
-       bluetooth.write((byte)data[readpointer][0]);
-       bluetooth.write((byte)data[readpointer][1]);
-       bluetooth.write((byte)data[readpointer][2]);
-       bluetooth.write((byte)data[readpointer][3]); 
-       println("BYTE " + 0 +" "+ (byte)data[readpointer][0] + " " + (byte)data[readpointer][1] + " " + (byte)data[readpointer][2] + " " + (byte)data[readpointer][3]);
-       readpointer++;
-       cmd=0;
-     //  delay(100);
-     //  println("ReadPointer ++");
-    }
+    //    println("READ " + readpointer);
+         bluetooth.write(0);
+         bluetooth.write((byte)data[readpointer][0]);
+         bluetooth.write((byte)data[readpointer][1]);
+         bluetooth.write((byte)data[readpointer][2]);
+         bluetooth.write((byte)data[readpointer][3]); 
+         println("BYTE " + 0 +" "+ (byte)data[readpointer][0] + " " + (byte)data[readpointer][1] + " " + (byte)data[readpointer][2] + " " + (byte)data[readpointer][3]);
+         readpointer++;
+         cmd=0;
+      }
  
 //   println("INT " + (int)data[readpointer][0] + " " + (int)data[readpointer][1] + " " + (int)data[readpointer][2] + " " + (int)data[readpointer][3]);
+    }
   }
   if(readpointer>=dataSize){
     readpointer=0;

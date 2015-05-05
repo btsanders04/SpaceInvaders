@@ -31,9 +31,10 @@ int dir;
 int x;
 int y;
 
-
+//determines if the pen is up or down
 int penToggle=1;
 int previousPen;
+
 //state the scribbler should be in. StartPage, Draw, or Calibrate
 int state;
 
@@ -103,16 +104,17 @@ void setup()
 void loop() {
  
   bluetoothSerial();
-  // Serial.println(bluetooth.readString());
- //drive_forward();
 
- if(drive){
+  if(drive){
+    
+     
      turnMotor(turnTime, dir);
-     //figure out how mag corresponds to time
+     delay(10);
      drive_forward(driveTime);
+     delay(10);
      lowerPen(penToggle);
-     //drive=false;
-      bluetooth.write(1);
+     delay(10);
+     bluetooth.write(1);
      
    //  Serial.print("SEND ");
    //  Serial.println(1);
@@ -121,6 +123,15 @@ void loop() {
 
 }
 
+
+//communication with the bluetooth. Reads in a command
+//0 --> waits for 4 pieces of data
+//      sets time to turn first
+//      sets time to drive forward second
+//      sets the direction to turn third
+//      and sets the state of the pen fourth
+//1 --> calibration. turns left
+//2 --> tells the motors to turn off
 void bluetoothSerial() {
  
   while(bluetooth.available()<1){}
@@ -135,12 +146,10 @@ void bluetoothSerial() {
   // Serial.print("CMD ");
   // Serial.println(cmd);
    if (cmd == 1 ) { //Start Calibration
+   //  automaton();
      turn_left();
      drive=false;
    }
- /*  else if (cmd == 3){
-       automaton();
-     }*/
     else if (cmd == 0) {  //Start Drive Mode
      while (bluetooth.available() < 4) { /* wait */ }
      
@@ -150,7 +159,6 @@ void bluetoothSerial() {
       // Serial.println(turnTime);
      // Serial.println(turnTime);
        turnTime=0;
-       
       // Serial.println();
      }
 
@@ -196,7 +204,6 @@ void bluetoothSerial() {
    } else if (cmd == 2){  //Stop Calibration
      motor_stop();
      drive=false;
-    // vangle=360*rotations/time;
    }
    
     
@@ -204,33 +211,22 @@ void bluetoothSerial() {
       
 }
 
-/*
+//hardcoded driving. it does indeed work
 void automaton(){
   for(int i=0;i<10;i++){
   drive_forward(1000);
+  delay(10);
   turnMotor(400, 0);
+  delay(10);
   motor_stop();
+  delay(10);
   }
+  
   drive_forward(1000);
 }
-/*
-void calibrate(){
-  time = millis()-currentTime;
-  turn_left();
-}
 
-/*
-double findAngle(double x, double y){
- double theta = (atan((y-currentY)/(x-currentX)))*(180/PI);
- double angle=theta-startAngle;
-  startAngle=theta;
-  return angle;
-}
-/*
-double findMag(double x, double y){
-  return sqrt(sq(x-currentX)+sq(y-currentY));
-}
-*/
+
+//tells the servo to raise or lower the pen
 void lowerPen(int lower)
 {
   if(lower==0)
@@ -239,6 +235,7 @@ void lowerPen(int lower)
   myservo.write( 90);
 }
 
+//turns the motor in the specified direction for the given time
 void turnMotor(float time, int dir)
 {
   int startTime=millis();
@@ -250,10 +247,10 @@ void turnMotor(float time, int dir)
    turn_right();
   }
   }
- // motor_stop();
+  motor_stop();
 }
 
-
+//stop the motors
 void motor_stop(){
 digitalWrite(motor_left[0], LOW);
 digitalWrite(motor_left[1], LOW);
@@ -263,6 +260,7 @@ digitalWrite(motor_right[1], LOW);
 //delay(25);
 }
 
+//turns both motors on and driving forward for the given time
 void drive_forward(int time){
   int currentTime=millis();
   while((millis()-currentTime)<time){
@@ -301,20 +299,4 @@ digitalWrite(motor_left[1], LOW);
 digitalWrite(motor_right[0], LOW);
 digitalWrite(motor_right[1], HIGH);
 }
-/*
-  */
-  /*
-{
-  if(bluetooth.available())  // If the bluetooth sent any characters
-  {
-    // Send any characters the bluetooth prints to the serial monitor
-    Serial.print((char)bluetooth.read());  
-  }
-  if(Serial.available())  // If stuff was typed in the serial monitor
-  {
-    // Send any characters the Serial monitor prints to the bluetooth
-    bluetooth.print((char)Serial.read());
-  }
-  // and loop forever and ever!
-}
-*/
+
